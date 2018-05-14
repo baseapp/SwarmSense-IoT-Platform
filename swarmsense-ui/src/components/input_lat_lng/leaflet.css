@@ -1,0 +1,14 @@
+.leaflet-container {
+  height: 600px;
+  margin: 0 auto;
+}
+.icon-status-on {
+  color: green;
+  width: 10px;
+  height: 10px;
+}
+.icon-status-off {
+  color: red;
+  width: 10px;
+  height: 10px;
+}

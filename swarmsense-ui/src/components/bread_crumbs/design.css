@@ -1,0 +1,33 @@
+#breadcrumb {
+  color: rgb(0, 188, 212);
+}
+.simple-link,
+#breadcrumb a {
+  text-decoration: none; /** removes default decoration of the links **/
+  color: rgb(0, 188, 212);
+  padding: 2px;
+}
+
+/* unvisited link */
+.simple-link:link,
+#breadcrumb a:link {
+  color: rgb(0, 188, 212);
+}
+
+/* visited link */
+.simple-link:visited,
+#breadcrumb a:visited {
+  color: rgb(0, 188, 212);
+}
+
+/* mouse over link */
+.simple-link:hover,
+#breadcrumb a:hover {
+  color: rgb(0, 188, 212);
+}
+
+/* selected link */
+.simple-link:active,
+#breadcrumb a:active {
+  color: rgb(0, 188, 212);
+}
