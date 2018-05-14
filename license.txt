@@ -1,0 +1,6 @@
+This is the repository for SwarmSense IoT Platform.
+
+The project are available under different licenses depending on whether it is intended for commercial/government use, or for a personal or non-commercial project.
+
+Read more on licensing alternatives here:
+- SwarmSense: https://www.baseapp.com/swarmsense-whitelabel-iot-platoform

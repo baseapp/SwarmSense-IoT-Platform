@@ -1,0 +1,7 @@
+/config.py
+app.log
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+snms.conf

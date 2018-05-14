@@ -1,0 +1,4277 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "SwarmSense IoT REST API",
+    "description": "REST API for SwarmSense IoT platform.",
+    "version": "0.0.1-alpha",
+    "contact": {
+      "name": "API Support",
+      "email": "gopal.kildoliya@baseapp.com"
+    }
+  },
+  "host": "45.79.8.213:5000",
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/",
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "Sensor": {
+      "type": "apiKey",
+      "name": "X-Sensor-Key",
+      "in": "header"
+    },
+    "Company": {
+      "type": "apiKey",
+      "name": "X-Company-Key",
+      "in": "header"
+    }
+  },
+  "paths": {
+    "/me": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Current User",
+        "description": "Get current user details.\n",
+        "tags": [
+          "Current User"
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Update Current User",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Update current user details.\n",
+        "tags": [
+          "Current User"
+        ],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/me/meta_data": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Get Meta Info",
+        "description": "Get all meta data for current user.\n\nResponse Data Example:\n```\n{\n  \"data\": [\n      {\n        \"key\" : \"current_company_id\",\n        \"value\" : 1,\n        \"id\" : 1\n      }\n    ],\n  \"total\": 1\n}\n```\n",
+        "tags": [
+          "Current User"
+        ],
+        "responses": {
+          "200": {
+            "description": "Meta Data",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total number of results."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add Update Current User Meta Data",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Update or add current user meta data.\n\nRequest Data Example:\n```\n{\n  \"key\": \"current_company_id\"\n  \"value\": \"1\"  \n}\n```\n",
+        "tags": [
+          "Current User"
+        ],
+        "parameters": [
+          {
+            "name": "Meta Data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "description": "key",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "value",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "User Login",
+        "description": "User Login.\n",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "User email"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "User Password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "Access token for user."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/signup": {
+      "post": {
+        "summary": "New User Signup",
+        "description": "New User Signup.\n",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of User"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "User email"
+                },
+                "password": {
+                  "type": "string",
+                  "format": "password",
+                  "description": "User Password"
+                },
+                "company_name": {
+                  "type": "string",
+                  "description": "Default company name."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Signup Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "Access token for user."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/forgot-password": {
+      "post": {
+        "summary": "Forgot Password",
+        "description": "Forgot Password.\n",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "User email"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reset link send to user",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "success message."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/reset-password": {
+      "post": {
+        "summary": "Reset Password",
+        "description": "Reset Password.\n",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "Reset details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "description": "Password reset code from mail"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "User email"
+                },
+                "password": {
+                  "type": "string",
+                  "description": "New Password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reset Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Password reset success."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/verify": {
+      "post": {
+        "summary": "Verify Email",
+        "description": "Verify Email.\n",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "Verification details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "description": "Verification code from mail"
+                },
+                "email": {
+                  "type": "string",
+                  "description": "User email"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Verification success."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Users",
+        "description": "Get all users. Example: `/users?sort=[\"email\",\"ASC\"]&range=[0, 24]`\n - **sort**: Sort order\n - **range**: Range\n",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "sort",
+            "description": "Sort the result. Example `?sort=[\"title\",\"ASC\"]`",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "range",
+            "description": "Range of the result or limit. Example `?range=[0, 24]`. This will return first 25 results.",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of users",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/User"
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total number of results."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Add user",
+        "description": "Add new user",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "user_details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User created"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/users/{user_id}": {
+      "parameters": [
+        {
+          "name": "user_id",
+          "description": "User ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "User details",
+        "description": "Get a user.\n",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "User",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Update user",
+        "description": "Update user details",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User Updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete user",
+        "description": "delete user",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/settings": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Web Settings",
+        "description": "All settings",
+        "tags": [
+          "Settings"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of Settings",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Setting"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Add Setting",
+        "description": "Add new Setting",
+        "tags": [
+          "Settings"
+        ],
+        "parameters": [
+          {
+            "name": "setting_details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Setting"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New Setting Added",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "Setting id"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/settings/{setting_id}": {
+      "parameters": [
+        {
+          "name": "setting_id",
+          "description": "Setting ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Setting details",
+        "description": "Get a Setting.\n",
+        "tags": [
+          "Settings"
+        ],
+        "responses": {
+          "200": {
+            "description": "Setting",
+            "schema": {
+              "$ref": "#/definitions/Setting"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Update Setting",
+        "description": "Update setting details",
+        "tags": [
+          "Settings"
+        ],
+        "parameters": [
+          {
+            "name": "setting_details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "description": "New Value"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Setting Updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete setting",
+        "description": "delete setting",
+        "tags": [
+          "Settings"
+        ],
+        "responses": {
+          "200": {
+            "description": "Setting deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/settings_all": {
+      "get": {
+        "summary": "All public Settings",
+        "description": "All settings which are public",
+        "tags": [
+          "Settings"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of Settings",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "description": "Key value pair"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sensor_types": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Sensor Types",
+        "description": "All Sensor Types",
+        "tags": [
+          "Sensor Types"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of Sensor Types",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/SensorType"
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total Count"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Add New Sensor Type",
+        "description": "Add new Sensor Type.\n\nRequest Example:\n\n    {\n      \"title\" : \"CPU Sensor\",\n      \"fields\": { \n        \"cpu\": {\n          \"title\": \"CPU Use\",\n          \"type\": \"float\",\n          \"unit\": \"%\"\n        },\n        \"memory\": {\n          \"title\": \"Memory\",\n          \"type\": \"float\",\n          \"unit\": \"%\"\n        },\n        \"temp\": {\n          \"title\": \"Temperature\",\n          \"type\": \"float\",\n          \"unit\": \"C\"\n        }\n      },\n      \"config_fields\": { \n        \"cpu\": {\n          \"name\": \"duty\",\n          \"sedcription\": \"Duty cycle\",\n          \"type\": \"int\",\n          \"default\": 60\n        },\n    } \n",
+        "tags": [
+          "Sensor Types"
+        ],
+        "parameters": [
+          {
+            "name": "Sensor Type Details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SensorType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New Sensor Type Added",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "Sensor Type ID"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sensor_types/{sensor_type_id}": {
+      "parameters": [
+        {
+          "name": "sensor_type_id",
+          "description": "Sensor Type ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Sensor Type Details",
+        "description": "Get a Sensor Type Details.\n",
+        "tags": [
+          "Sensor Types"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor Type Details",
+            "schema": {
+              "$ref": "#/definitions/SensorType"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Update Sensor Type Details",
+        "description": "Update Sensor Type Details",
+        "tags": [
+          "Sensor Types"
+        ],
+        "parameters": [
+          {
+            "name": "Sensor Type Details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SensorType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Setting Updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete Sensor Type",
+        "description": "Delete Sensor Type. This will also delete all the sensors of this type from database.",
+        "tags": [
+          "Sensor Types"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor Type deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sensor_types_all": {
+      "get": {
+        "summary": "All Sensor Type",
+        "description": "All Sensor Type",
+        "tags": [
+          "Sensor Types"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of Sensor Types",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SensorType"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sensor_data_types": {
+      "get": {
+        "summary": "Sensor Fields Data Types",
+        "description": "Sensor Fields Data Type",
+        "tags": [
+          "Sensor Types"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of Data Types",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Data type name"
+                      },
+                      "alias": {
+                        "type": "string",
+                        "description": "Data type alias"
+                      }
+                    }
+                  }
+                },
+                "total": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Companies",
+        "description": "Get all companies for users.\n",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of companies",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Company"
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total number of results."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Add company",
+        "description": "Add new company",
+        "tags": [
+          "Companies"
+        ],
+        "parameters": [
+          {
+            "name": "company_details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Company name"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "company id"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Company details",
+        "description": "Get a comapny.\n",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Company",
+            "schema": {
+              "$ref": "#/definitions/Company"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Update company",
+        "description": "Update company details",
+        "tags": [
+          "Companies"
+        ],
+        "parameters": [
+          {
+            "name": "company",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Company"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company Updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete company",
+        "description": "delete company",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Company deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/stats": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Company Stats for last hour",
+        "description": "Dashboard details for company for last one hour.|\nExample Response:\n\n```\n{\n    \"alerts_generated\": 3,\n    \"devices_online\": 3,\n    \"message_received\": 63,\n    \"new_devices\": 2\n}\n```\n",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Stats",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/dashboard": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Company dashboard",
+        "description": "Dashboard details for company.\n",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "dashboard details",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/users": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Company Users",
+        "description": "Get all the users for comapny.\n",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of users",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add user to company",
+        "description": "Add user to the company. If a user is not registered, it will send an invitation to the user.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Companies"
+        ],
+        "parameters": [
+          {
+            "name": "User",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "User email"
+                },
+                "role": {
+                  "type": "string",
+                  "description": "User Role (read, write, admin)",
+                  "enum": [
+                    "read",
+                    "write",
+                    "admin"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User added"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove user from company",
+        "description": "Remove user from the company",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Companies"
+        ],
+        "parameters": [
+          {
+            "name": "User Emails",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_emails": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "description": "User email"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/sensors": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Sensors",
+        "description": "Get all sensors for users.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensors",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Sensor"
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total count of data"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add Sensor",
+        "description": "Add a new sensor.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "parameters": [
+          {
+            "name": "Sensor",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Sensor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Sensor"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/sensors_by_type/{sensor_type}": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sensor_type",
+          "description": "Sensor Type",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get Sensors by Type",
+        "description": "Get all sensors for company by sensor type.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of sensors",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Sensor"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/sensors/{sensor_id}": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sensor_id",
+          "description": "Sensor ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Sensor",
+        "description": "Get sensor details.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor",
+            "schema": {
+              "$ref": "#/definitions/Sensor"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Sensors details",
+        "description": "Update sensor details.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "details",
+            "description": "Sensor Details.",
+            "schema": {
+              "$ref": "#/definitions/Sensor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor details updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Sensor",
+        "description": "Delete a sensor.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/configuration": {
+      "parameters": [
+        {
+          "name": "sensor_id",
+          "description": "Sensor ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Sensors configuration",
+        "description": "Get sensors configuration.\nReasult will be a object with key value pairs.\n\nExample Response:         \n`{\n  \"key\": \"value\", \n  \"url\": \"google.com\"\n  }`\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor Configuration",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Sensor configuration update",
+        "description": "Update sensor configuration.\nInput will be a object with key value pairs.\n\nExample Input:         \n`{\n  \"key\": \"value\", \n  \"url\": \"google.com\"\n  }`\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "data",
+            "description": "Sensor configuration data.",
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Configuration Updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/values": {
+      "parameters": [
+        {
+          "name": "sensor_id",
+          "description": "Sensor ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Sensors reading",
+        "description": "Get current value of sensor.\n",
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "Sensor": []
+          },
+          {
+            "Company": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of sensors reading",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Sensors reading",
+        "description": "Save new value of sensor reading.\n",
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "Sensor": []
+          },
+          {
+            "Company": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "data",
+            "description": "Sensor reading data.",
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Value updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/events": {
+      "parameters": [
+        {
+          "name": "sensor_id",
+          "description": "Sensor ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Sensors Scheduled Events",
+        "description": "Get scheduled events attached to current sensor.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors",
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of events",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "event_id": {
+                    "type": "string",
+                    "description": "Unique identifier for event."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name for event."
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add events to sensor",
+        "description": "Add new scheduled events to sensor.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors",
+          "Events"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "data",
+            "description": "Event IDs",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "event_ids": {
+                  "type": "array",
+                  "description": "Id of events to add with sensor",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor Events updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove events from sensor",
+        "description": "Delete an event from sensor.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors",
+          "Events"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "data",
+            "description": "Events IDs",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "event_ids": {
+                  "type": "array",
+                  "description": "Id of events to delete from sensor",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor Events deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/alerts": {
+      "parameters": [
+        {
+          "name": "sensor_id",
+          "description": "Sensor ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Sensors Alerts",
+        "description": "Get alerts or notifications attached to current sensor.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors",
+          "Alerts"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of sensors alerts",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "alert_id": {
+                    "type": "string",
+                    "description": "Unique identifier for alert."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name for alert."
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add sensor alert",
+        "description": "Add new alerts or notification to sensor.\nIf the selected alert has action type of **trigger** the you have to provide **actuator_id** whose config values will be changed on alert. \n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors",
+          "Alerts"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "data",
+            "description": "Alert IDs",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "alert_ids": {
+                  "type": "array",
+                  "description": "Id of alerts to add with sensor",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "actuator_id": {
+                  "type": "string",
+                  "description": "ID of actuator in case of alert action is trigger"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor Alerts updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove sensor alerts",
+        "description": "Delete an alert from sensor.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sensors",
+          "Alerts"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "data",
+            "description": "Alert IDs",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "alert_ids": {
+                  "type": "array",
+                  "description": "Id of alerts to delete from sensor",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor Alerts deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/aggregate": {
+      "get": {
+        "summary": "Sensors Data Aggregate Min, Max, Mean",
+        "description": "Get Aggregate valuse like Min, Max for Sensor over a period of time.\n\n**Response Example**:\n```\n{\n  \"max_count\": 30,\n  \"max_cpu\": 100,\n  \"max_disk\": 7,\n  \"max_memory\": 33.3,\n  \"mean_count\": 0.0753984442037446,\n  \"mean_cpu\": 21.184150853155842,\n  \"mean_disk\": 6.634774719014172,\n  \"mean_memory\": 14.508492171784614,\n  \"min_count\": 0,\n  \"min_cpu\": 0,\n  \"min_disk\": 6,\n  \"min_memory\": 10.2,\n  \"time\": \"1970-01-01T00:00:00Z\"\n}\n```\n",
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "Sensor": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "parameters": [
+          {
+            "name": "sensor_id",
+            "description": "Sensor ID.",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "filter",
+            "description": "Date filters",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregate Values",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/history": {
+      "get": {
+        "summary": "Sensors Data History",
+        "description": "Get sensor data history.\n",
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "Sensor": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "parameters": [
+          {
+            "name": "sensor_id",
+            "description": "Sensor ID.",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of sensors reading",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total count of data"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/sensors/{sensor_id}/export": {
+      "get": {
+        "summary": "Sensors Data Export",
+        "description": "Get sensor data exported to CSV.\n",
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "Sensor": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "parameters": [
+          {
+            "name": "sensor_id",
+            "description": "Sensor ID.",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "CSV file with sensor data"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/sensor_by_hid/{sensor_hid}": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sensor_hid",
+          "description": "Sensor HID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get sensor by HID",
+        "description": "Get the sensor details by HID.\n",
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "Company": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor",
+            "schema": {
+              "$ref": "#/definitions/Sensor"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/sensor_by_hid/{sensor_hid}/values": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sensor_hid",
+          "description": "Sensor HID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "Save sensor data",
+        "description": "Save new value of sensor reading.\n",
+        "security": [
+          {
+            "Bearer": []
+          },
+          {
+            "Company": []
+          }
+        ],
+        "tags": [
+          "Sensors"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "data",
+            "description": "Sensor reading data.",
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Value updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/event_logs": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Company Event Log History",
+        "description": "Get all the event logs related to company.\n\n---------------------\n\nResponse Example:\n-----------------\n```\n{\n  \"data\": [\n    {\n      \"log\": \"Sensor Created\",\n      \"company_id\": \"00516370ff8ae4a5\",\n      \"time\": \"2017-08-02T07:41:48.923022878Z\"\n    }\n  ],\n  \"total\":1\n}\n```\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Event Logs history\n\n**Response Example:**\n```\n{\n  \"data\": [\n    {\n      \"log\": \"Sensor Created\",\n      \"company_id\": \"00516370ff8ae4a5\",\n      \"time\": \"2017-08-02T07:41:48.923022878Z\"\n    }\n  ],\n  \"total\":1\n}\n```\n",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "log": {
+                        "type": "string",
+                        "description": "Log details"
+                      },
+                      "time": {
+                        "type": "string",
+                        "description": "Log time"
+                      }
+                    }
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total count of data"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/alerts": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Company Sensors Alerts",
+        "description": "Get all the alertes for company sensors.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Alerts"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of alerts",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Alert"
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total count of data"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add Company Sensors Alerts",
+        "description": "Add a new alert for company sensors.\nThere are two type of actions for alerts. \n1. notification \n2. trigger\n\nIn **notification** action type you can send SMS, emails or can call web-hooks. For this type following fields are required.\n- snooze\n- alert_text\n\nIn **trigger** action type, you can set a configuration field of a sensor (Actuator). The following fields are required for this type:\n- actuator_type\n- config_field\n- config_value\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Alert",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Alert"
+            }
+          }
+        ],
+        "tags": [
+          "Alerts"
+        ],
+        "responses": {
+          "200": {
+            "description": "Alert added"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/alert_history": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Company Sensors Alerts Trigger History",
+        "description": "Get all the alertes trigger history for company sensors.\n\n---------------------\n\nResponse Example:\n-----------------\n```\n{\n  \"data\": [\n    {\n      \"alert_id\": \"1ad656ad6a5d5a64\",\n      \"alert_name\": \"High RAM Use\",\n      \"alert_text\": \"Memory use in Sensor name more then 85%\",\n      \"company_id\": \"00516370ff8ae4a5\",\n      \"sensor_id\": \"6aa52b519c845565\",\n      \"sensor_name\": \"Sensor name\",\n      \"time\": \"2017-08-02T07:41:48.923022878Z\"\n    }\n  ],\n  \"total\":1\n}\n```\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Alerts",
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Alerts history\n\n**Response Example:**\n```\n{\n  \"data\": [\n    {\n      \"alert_id\": \"1ad656ad6a5d5a64\",\n      \"alert_name\": \"High RAM Use\",\n      \"alert_text\": \"Memory use in Sensor name more then 85%\",\n      \"company_id\": \"00516370ff8ae4a5\",\n      \"sensor_id\": \"6aa52b519c845565\",\n      \"sensor_name\": \"Sensor name\",\n      \"time\": \"2017-08-02T07:41:48.923022878Z\"\n    }\n  ],\n  \"total\":1\n}\n```\n",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "alert_id": {
+                        "type": "string",
+                        "description": "Alert ID"
+                      },
+                      "alert_name": {
+                        "type": "string",
+                        "description": "Alert name"
+                      },
+                      "alert_text": {
+                        "type": "string",
+                        "description": "Alert text send"
+                      },
+                      "sensor_id": {
+                        "type": "string",
+                        "description": "Sensor ID"
+                      },
+                      "sensor_name": {
+                        "type": "string",
+                        "description": "Sensor Name"
+                      },
+                      "time": {
+                        "type": "string",
+                        "description": "Alert execution time"
+                      }
+                    }
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total count of data"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/alerts/{alert_id}": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "alert_id",
+          "description": "Alert ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Alert",
+        "description": "Get Alert details.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Alerts"
+        ],
+        "responses": {
+          "200": {
+            "description": "Alert",
+            "schema": {
+              "$ref": "#/definitions/Alert"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Alert details",
+        "description": "Update Alert details.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Alerts"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "details",
+            "description": "Alert data.",
+            "schema": {
+              "$ref": "#/definitions/Alert"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Alert details updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Alert",
+        "description": "Delete an alert.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Alerts"
+        ],
+        "responses": {
+          "200": {
+            "description": "Alert deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/events": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get Company Sensors Scheduled Events",
+        "description": "Get all the scheduled events for company sensors.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of Events",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Event"
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total count of data"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add Company Sensors Event",
+        "description": "Add a new scheduled event for company sensors.\nEvents are schudeled task that will run on a given time and can update config of an actuator (sensor).\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "Event",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Event"
+            }
+          }
+        ],
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Event added"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/event_history": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Company Sensors Event Trigger History",
+        "description": "Get all the events trigger history for company sensors.\n\n---------------------\n\nResponse Example:\n-----------------\n```\n{\n  \"data\": [\n    {\n      \"event_id\": \"1ad656ad6a5d5a64\",\n      \"event_name\": \"Update IP\",\n      \"company_id\": \"00516370ff8ae4a5\",\n      \"sensor_id\": \"6aa52b519c845565\",\n      \"sensor_name\": \"Sensor name\",\n      \"time\": \"2017-08-02T07:41:48.923022878Z\"\n    }\n  ],\n  \"total\":1\n}\n```\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Events",
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Events history\n\n**Response Example:**\n```\n{\n  \"data\": [\n    {\n      \"event_id\": \"1ad656ad6a5d5a64\",\n      \"event_name\": \"Update IP\",\n      \"company_id\": \"00516370ff8ae4a5\",\n      \"sensor_id\": \"6aa52b519c845565\",\n      \"sensor_name\": \"Sensor name\",\n      \"time\": \"2017-08-02T07:41:48.923022878Z\"\n    }\n  ],\n  \"total\":1\n}\n```\n",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "event_id": {
+                        "type": "string",
+                        "description": "Event ID"
+                      },
+                      "event_name": {
+                        "type": "string",
+                        "description": "Event name"
+                      },
+                      "sensor_id": {
+                        "type": "string",
+                        "description": "Sensor ID"
+                      },
+                      "sensor_name": {
+                        "type": "string",
+                        "description": "Sensor Name"
+                      },
+                      "time": {
+                        "type": "string",
+                        "description": "Event execution time"
+                      }
+                    }
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total count of data"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/events/{event_id}": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "description": "Company ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "event_id",
+          "description": "Event ID.",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Get an Event",
+        "description": "Get Event details.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Event",
+            "schema": {
+              "$ref": "#/definitions/Event"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Event details",
+        "description": "Update Event details.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "details",
+            "description": "Event data.",
+            "schema": {
+              "$ref": "#/definitions/Event"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event details updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Event",
+        "description": "Delete an Event.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Event deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/networks": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Company Sensor Networks",
+        "description": "Get all the sensor networks for company.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of sensor networks",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Network ID"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Network Name"
+                      },
+                      "sensor_count": {
+                        "type": "integer",
+                        "description": "Number of sensors under the network"
+                      }
+                    }
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total count of data"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add new network.",
+        "description": "Add new network to company.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "parameters": [
+          {
+            "name": "Network Details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Network name"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New Network Added"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/networks/{network_id}": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "network_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Company Sensor Network",
+        "description": "Get network details.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensor network",
+            "schema": {
+              "$ref": "#/definitions/Network"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update network.",
+        "description": "Update network.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "parameters": [
+          {
+            "name": "Newtwork Details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Network name"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Network details updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete network.",
+        "description": "delete network.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "responses": {
+          "200": {
+            "description": "Network deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/networks/{network_id}/floormap": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "network_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "FloorMap for Network",
+        "description": "Get Floormap of network.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "responses": {
+          "200": {
+            "description": "Floormap Image File"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add floormap to network.",
+        "description": "Add floormap to network.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "floormap",
+            "in": "formData",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Network details updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete network floormap.",
+        "description": "delete network floormap.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "responses": {
+          "200": {
+            "description": "Network floormap deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/networks/{network_id}/sensors": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "network_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Company Sensors in Network",
+        "description": "Grt all the sensors in the network.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of sensors",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Sensor"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add sensors to network.",
+        "description": "Add sensors to the network.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "sensor list",
+            "description": "List of sensors to add to the network.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sensor_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Network updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete network.",
+        "description": "delete network.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "sensor list",
+            "description": "List of sensors to remove from network.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sensor_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sensors removed from network."
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/networks/{network_id}/alerts": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "network_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Network Alerts",
+        "description": "Get alerts or notifications attached to current network.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of alerts",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Alert"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add network alert",
+        "description": "Add new alerts or notification to network.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "data",
+            "description": "Alert IDs",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "alert_ids": {
+                  "type": "array",
+                  "description": "Id of alerts to add with network",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Network Alerts updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove network alerts",
+        "description": "Delete an alert from network.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Networks",
+          "Alerts"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "data",
+            "description": "Alert IDs",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "alert_ids": {
+                  "type": "array",
+                  "description": "Id of alerts to delete from network",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Network Alerts deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/dashboards": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Company Dashboards",
+        "description": "Get all the dashboards for company.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Dashboards"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of dashboards",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Dashboard ID"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Dashboard Name"
+                      },
+                      "data": {
+                        "type": "object",
+                        "description": "Other details"
+                      }
+                    }
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total count of data"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add new dashboard.",
+        "description": "Add new dashboard to company.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Dashboards"
+        ],
+        "parameters": [
+          {
+            "name": "Dashboard Details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Dashboard Name"
+                },
+                "data": {
+                  "type": "object",
+                  "description": "Other details"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New Dashboard Added"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/dashboards/{dashboard_id}": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "dashboard_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Company Dashboard",
+        "description": "Get dashboard details.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Dashboards"
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboards",
+            "schema": {
+              "$ref": "#/definitions/Dashboard"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Dashboards.",
+        "description": "Update Dashboards.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Dashboards"
+        ],
+        "parameters": [
+          {
+            "name": "Dashboard Details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Dashboard Name"
+                },
+                "data": {
+                  "type": "object",
+                  "description": "Other details"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard details updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete dashboard.",
+        "description": "delete dashboard.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Dashboards"
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/dashboards/{dashboard_id}/widgets": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "dashboard_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Dashboards Widgets",
+        "description": "Get all the widgets for dashboard.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Dashboard Widgets"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of Widgets",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Widgets ID"
+                      },
+                      "data": {
+                        "type": "object",
+                        "description": "Other details"
+                      }
+                    }
+                  }
+                },
+                "total": {
+                  "type": "integer",
+                  "description": "Total count of data"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add new Widget.",
+        "description": "Add new widget to dashboard.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Dashboard Widgets"
+        ],
+        "parameters": [
+          {
+            "name": "Widget Details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "description": "Widget details"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New Widget Added"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/companies/{company_id}/dashboards/{dashboard_id}/widgets/{widget_id}": {
+      "parameters": [
+        {
+          "name": "company_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "dashboard_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "widget_id",
+          "in": "path",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Dashboard Widget",
+        "description": "Get Widget details.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Dashboard Widgets"
+        ],
+        "responses": {
+          "200": {
+            "description": "Widget",
+            "schema": {
+              "$ref": "#/definitions/Widget"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update Widget.",
+        "description": "Update Widget.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Dashboard Widgets"
+        ],
+        "parameters": [
+          {
+            "name": "Widget Details",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "description": "Widget details"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Widget details updated"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete widget.",
+        "description": "delete dashboard widget.\n",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Dashboard Widgets"
+        ],
+        "responses": {
+          "200": {
+            "description": "Widget deleted"
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for user.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of user."
+        },
+        "phone": {
+          "type": "string",
+          "description": "User phone number."
+        }
+      }
+    },
+    "Sensor": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for sensor.",
+          "readOnly": true
+        },
+        "type": {
+          "type": "string",
+          "description": "Sensor type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of sensor."
+        },
+        "value": {
+          "type": "object",
+          "description": "Last reading of sensor.",
+          "readOnly": true
+        },
+        "is_down": {
+          "type": "boolean",
+          "description": "Is the sensor is down",
+          "readOnly": true
+        },
+        "key": {
+          "type": "string",
+          "description": "Sensor key. Used for sensor authentication",
+          "readOnly": true
+        },
+        "config": {
+          "type": "object",
+          "description": "Sensor Configuration.",
+          "readOnly": true
+        }
+      }
+    },
+    "Company": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for company",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of Company."
+        },
+        "owner_name": {
+          "type": "string",
+          "description": "Name of admin user."
+        }
+      }
+    },
+    "Network": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for network.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of network."
+        },
+        "company_id": {
+          "type": "string",
+          "description": "ID of company."
+        }
+      }
+    },
+    "Dashboard": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for dashboard.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of dashboard."
+        },
+        "data": {
+          "type": "object",
+          "description": "Other data for dashboard."
+        }
+      }
+    },
+    "Widget": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for widget.",
+          "readOnly": true
+        },
+        "data": {
+          "type": "object",
+          "description": "Data for widget."
+        }
+      }
+    },
+    "Alert": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "unique identifier for alert or notification.",
+          "readOnly": true
+        },
+        "company_id": {
+          "type": "string",
+          "description": "Unique id of registered company.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of alert."
+        },
+        "recipients": {
+          "type": "array",
+          "description": "Recipients. Email list of users",
+          "items": {
+            "type": "string"
+          }
+        },
+        "web_hooks": {
+          "type": "array",
+          "description": "Web Hooks. System will make a POST request to given web hook",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "Url"
+              },
+              "payload": {
+                "type": "object",
+                "description": "Data to be send with post request."
+              }
+            }
+          }
+        },
+        "sensor_type": {
+          "type": "string",
+          "description": "Sensor Type"
+        },
+        "type": {
+          "type": "string",
+          "description": "Alert type.",
+          "default": "lt",
+          "enum": [
+            "lt",
+            "lte",
+            "gt",
+            "gte",
+            "eq",
+            "neq"
+          ]
+        },
+        "field": {
+          "type": "string",
+          "description": "Field of sensor to compare."
+        },
+        "value": {
+          "type": "string",
+          "description": "Threshold value to compare with."
+        },
+        "snooze": {
+          "type": "integer",
+          "description": "Minutes before next alert."
+        },
+        "alert_text": {
+          "type": "string",
+          "description": "Alert text. This text will be send to user. You can use template veriables in the text."
+        },
+        "is_active": {
+          "type": "boolean",
+          "description": "Is the alert is active or not. Alert will run only if it is active."
+        },
+        "action_type": {
+          "type": "string",
+          "description": "Type of action. notification or trigger.",
+          "default": "notification",
+          "enum": [
+            "notification",
+            "trigger"
+          ]
+        },
+        "actuator_type": {
+          "type": "string",
+          "description": "Type of sensor whose config value will be changed."
+        },
+        "config_field": {
+          "type": "string",
+          "description": "Configuration field of actuator."
+        },
+        "config_value": {
+          "type": "string",
+          "description": "New value for config field. Required if action_type is **trigger**"
+        }
+      }
+    },
+    "Event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "unique identifier for scheduled event.",
+          "readOnly": true
+        },
+        "company_id": {
+          "type": "string",
+          "description": "Unique id of registered company.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of event."
+        },
+        "repeat": {
+          "type": "boolean",
+          "description": "If the event is repeatative or one time."
+        },
+        "unit": {
+          "type": "string",
+          "description": "Repeat Event. If **repeat** is **true** then **unit** is required.",
+          "default": "day",
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ]
+        },
+        "is_active": {
+          "type": "boolean",
+          "description": "Is the scheduled event is active or not. Event will run only if it is active."
+        },
+        "actuator_type": {
+          "type": "string",
+          "description": "Type of sensor whose config value will be changed."
+        },
+        "config_field": {
+          "type": "string",
+          "description": "Configuration field of actuator."
+        },
+        "config_value": {
+          "type": "string",
+          "description": "New value for config field."
+        },
+        "start_date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start date time for event"
+        },
+        "next_runtime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Next date time when the event will run.",
+          "readOnly": true
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "string"
+        }
+      }
+    },
+    "Setting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "ID",
+          "readOnly": true
+        },
+        "key": {
+          "type": "string",
+          "description": "Setting Key"
+        },
+        "value": {
+          "type": "string",
+          "description": "Setting value"
+        },
+        "group": {
+          "type": "string",
+          "description": "Setting group"
+        },
+        "access": {
+          "type": "string",
+          "description": "Setting Access Level (public or private) Public setting will be available to all users.",
+          "enum": [
+            "public",
+            "private"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Setting Description"
+        },
+        "label": {
+          "type": "string",
+          "description": "Label"
+        },
+        "order": {
+          "type": "integer",
+          "description": "Setting order"
+        }
+      }
+    },
+    "SensorType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "ID",
+          "readOnly": true
+        },
+        "title": {
+          "type": "string",
+          "description": "Sensor Title"
+        },
+        "status_timeout": {
+          "type": "integer",
+          "description": "Minutes of inactivity after device will be considered as down"
+        },
+        "fields": {
+          "type": "object",
+          "description": "Sensor Fields"
+        },
+        "config_fields": {
+          "type": "object",
+          "description": "Sensor Configuration Fields"
+        }
+      }
+    }
+  }
+}

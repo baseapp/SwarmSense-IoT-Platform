@@ -1,0 +1,205 @@
+#--------------------------
+# SNMS configuration file
+#--------------------------
+#
+# This file is only read when the application is initialized.
+# If you change any value you will need to restart your WSGI server for
+# the config file to be re-read.
+#
+# The file is executed as Python code so you can use anything that's allowed in PYthon.
+
+#------------------------------------------------------------------------------
+# SQLAlchemy DB
+#------------------------------------------------------------------------------
+
+SQLALCHEMY_DATABASE_URI = 'postgresql:///snms'
+
+# Size of the connection pool (default = 5)
+# SQLALCHEMY_POOL_SIZE = 5
+
+# Connection timeout
+# SQLALCHEMY_POOL_TIMEOUT = 10
+
+# Number of seconds after which a connection is automatically
+# recycled (default = 120)
+# SQLALCHEMY_POOL_RECYCLE = 120
+
+# Number of connections that can be breated after pool is at maximum
+# size (default = 3)
+# SQLALCHEMY_MAX_OVERFLOW = 3
+
+#------------------------------------------------------------------------------
+# SECURITY
+#------------------------------------------------------------------------------
+# To sign data such as activation tokens used in emails, SNMS needs a secret
+# key.  It should be a random string; the preferred way to generate it is using
+# `import os; os.urandom(32)` in a Python shell.
+SECRET_KEY = ''
+
+#------------------------------------------------------------------------------
+# Development
+#------------------------------------------------------------------------------
+# Enable debug mode to get unminified assets, verbose error messages in the
+# browser and various other things that are useful when developing snms or
+# tracking down errors but should not be enabled for production systems.
+#DEBUG = False
+#
+# If you want to see all queries sent to the database in real-time, enable
+# sqlalchemy logging and run the `bin/utils/db_log.py` script in a separate
+# terminal window.
+#DB_LOG = False
+#
+# You can cause all error-like exceptions (i.e. not something like AccessError)
+# to be propagated outside the SNMS WSGI app by enabling this option. This has
+# the advantage of triggering the Werkzeug debugger of the embedded server even
+# in case of e.g. a MaKaCError.
+#PROPAGATE_ALL_EXCEPTIONS = False
+
+#------------------------------------------------------------------------------
+# URLs
+#------------------------------------------------------------------------------
+# BaseURL is the url where SNMS will be accessed.
+# Except for development systems this should be a https URL and your web server
+# should be configured to redirect all HTTP requests to HTTPS.
+BASE_URL = 'https://snms.yourdomain.tld'
+
+# If you upgraded from an older SNMS version (pre-2.0) and want to preserve
+# older URLs you should enable this option to avoid breaking links in search
+# engines and other websites.
+#ROUTE_OLD_URLS = False
+
+
+#------------------------------------------------------------------------------
+# DIRECTORIES
+#------------------------------------------------------------------------------
+LOG_DIR    = '/opt/snms/log'
+TEMP_DIR   = '/opt/snms/tmp'
+ASSETS_DIR = '/opt/snms/assets'
+CACHE_DIR  = '/opt/snms/cache'
+# You can use 'redis', 'memcached' or 'files'. The files backend caches objects in
+# CacheDir while the Memcached backend uses one or more memcached servers.
+#CACHE_BACKEND         = 'files'
+# When using memcached, provide a tuple containing 'ip:port' entries for the
+# memcached servers. Do not forget to firewall those servers as memcached has no
+# authentication at all!
+#MEMCACHED_SERVERS     = ('127.0.0.1:11211',)
+# When using redis, provide a redis connection string for the Redis server.
+#REDIS_CACHE_URL = 'redis://unused:password@localhost:6379/1'
+
+
+#------------------------------------------------------------------------------
+# FILE UPLOAD
+#------------------------------------------------------------------------------
+# Here you can limit the maximum size of all the uploaded files (in MB) in a
+# request. This is a hard limit that is enforced on the server side.
+# default: 0 (unlimited)
+
+MAX_UPLOAD_FILES_TOTAL_SIZE = 0
+
+# Here you can limit the maximum size of an uploaded file (in MB)
+# default: 0 (unlimited)
+# Please note that this limit is only enforced on the client side!
+# For a hard limit see MaxUploadFilesTotalSize
+
+MAX_UPLOAD_FILE_SIZE = 0
+
+
+#------------------------------------------------------------------------------
+# STATIC FILE DELIVERY
+#------------------------------------------------------------------------------
+# SNMS supports the use of the X-Sendfile and X-Accel-Redirect headers:
+#
+# http://blog.lighttpd.net/articles/2006/07/02/x-sendfile
+# http://wiki.nginx.org/X-accel
+#
+# If your webserver supports this feature and you want to activate it,
+# you should enable it here
+#
+# X-Sendfile (apache with mod_xsendfile, lighttpd):
+# STATIC_FILE_METHOD = 'xsendfile'
+#
+# X-Accel-Redirect (nginx):
+# STATIC_FILE_METHOD = ('xaccelredirect', {
+#     '/opt/snms/archive': '/.xsf/archive',
+#     '/opt/snms/cache': '/.xsf/cache',
+#     '/opt/snms/htdocs': '/.xsf/htdocs'
+# })
+# Because of the way nginx works (using URLs instead of paths) you also need to map the .xsf urls to
+# the paths in your nginx config (for each entry in the dict above):
+# location /.xsf/archive/ {
+#     internal;
+#     alias /opt/snms/archive/;
+# }
+# DO NOT forget the "internal;" statement - it prevents users from accessing those URLs directly.
+
+#STATIC_FILE_METHOD = None
+
+# If snms is behind a proxy, the user's IP needs to be retrieved from the
+# HTTP_X_FORWARDED_FOR header. To enable this behavior, set UseProxy to True.
+# Note that this MUST NOT be enabled if the machine is accessible directly or
+# users will be able to spoof their IP address!
+#USE_PROXY = False
+
+
+#------------------------------------------------------------------------------
+# LOGGING
+#------------------------------------------------------------------------------
+# To use Sentry (https://sentry.io), simply set the SENTRY_DSN:
+# SENTRY_DSN = 'http://user:password@logger.example.com/n'
+# SENTRY_LOGGING_LEVEL = 'ERROR'  # default: 'WARNING'
+
+
+#------------------------------------------------------------------------------
+# GLOBAL DEFAULTS
+#------------------------------------------------------------------------------
+
+# The timezone that is used by default. This also affects the timezone used by
+# periodic tasks.
+#DEFAULT_TIMEZONE = 'UTC'
+#
+# The locale that is used by default for i18n.
+#DEFAULT_LOCALE = 'en_GB'
+
+
+#------------------------------------------------------------------------------
+# CELERY
+#------------------------------------------------------------------------------
+
+# SNMS uses Celery to run time-consuming background tasks and periodic jobs.
+# You must configure a Celery "broker" which is used to  communicate between
+# SNMS and the worker(s).
+# We recommend Redis as it is very easy to set up. For details, see the Celery
+# documentation:
+# http://celery.readthedocs.org/en/latest/getting-started/brokers/redis.html
+#CELERY_BROKER = 'redis://unused:password@localhost:6379/0'
+#
+# By default, task results are stored in the broker backend, but you can
+# override it.
+#CELERY_RESULT_BACKEND = None
+#
+# By default, all periodic tasks are enabled and use a schedule that is
+# considered appropriate by the SNMS developers.  You can override this
+# for specific tasks using the `ScheduledTaskOverride` dict.  The key is the
+# name of the task and the value can be one of the following:
+# - `None` or `False`: Disables the task completely
+# - A dictionary, as described in the Celery documentation
+#   http://celery.readthedocs.org/en/latest/userguide/periodic-tasks.html#available-fields
+#   The `task` key is not necessary in this case, as it is set automatically.
+# - A `timedelta` or `crontab` object which will just override the schedule
+#   and not touch any other options of the task.
+#SCHEDULED_TASK_OVERRIDE = {}
+#
+# You can use the `CeleryConfig` settings to specify/override any config option
+# supported by Celery. For the full list of options, see the Celery docs at
+# http://celery.readthedocs.org/en/latest/configuration.html
+#CELERY_CONFIG = {}
+#
+# Your Celery workers can be monitored using Flower.  To use it, simply start it
+# using `snms celery flower`; by default it will listen on the same host as
+# specified in BaseURL (non-SSL) on port 5555.  Authentication is done using
+# OAuth so only snms administrators can access flower.  You need to configure
+# the allowed auth callback URLs in the SNMS administration area; otherwise
+# authentication will fail with an OAuth error.
+# To get a link to Flower in the administration menu, set `FlowerURL` to the URL
+# under which your Flower instance is accessible:
+#FLOWER_URL = None

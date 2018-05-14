@@ -1,0 +1,6 @@
+recursive-include snms *.html *.tpl *.txt *.js *.yaml
+
+graft snms/migrations/
+
+global-exclude *.pyc __pycache__ .keep
+include snms/migrations/versions/.keep
