@@ -1,0 +1,31 @@
+# Example nginx server configuration file.
+server {
+        listen 80;
+        listen [::]:80;
+
+        root /var/www/snms;
+        index index.html index.htm;
+
+        # Make site accessible from http://localhost/
+        server_name localhost;
+
+        # We are using /api location for our backend. Place frontend content in root
+        # path and user <hostname>/api for backend endpoint.
+
+        location = /api { rewrite ^ /api/ last; }
+        location /api { try_files $uri @snms; }
+
+	    location / {
+                root   /var/www/snms;
+                index  index.html index.htm;
+        }
+
+        location @snms {
+                include fastcgi_params;
+		        fastcgi_split_path_info ^(/api)(.*)$;
+    		    fastcgi_param PATH_INFO $fastcgi_path_info;
+    		    fastcgi_param SCRIPT_NAME $fastcgi_script_name;
+                fastcgi_pass unix:/opt/snms/snms.sock;
+        }
+
+}
