@@ -34,7 +34,7 @@ let CompaniesUsersList = props => {
                   onEditItem={record => set_params("user", record)}
                   primaryText={record => `Name: ${record.name}`}
                   secondaryText={record =>
-                    `Email: ${record.email} (Ph: ${record.phone})`
+                    `Email: ${record.email} (Role: ${record.role})`
                   }
                 />
               }
@@ -42,7 +42,7 @@ let CompaniesUsersList = props => {
                 <Datagrid>
                   <TextField source="name" />
                   <EmailField source="email" />
-                  <TextField source="phone" />
+                  <TextField source="role" />
                   <EditButton onClick={record => set_params("user", record)} />
                 </Datagrid>
               }
