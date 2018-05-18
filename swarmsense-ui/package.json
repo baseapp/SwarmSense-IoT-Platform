@@ -1,13 +1,15 @@
 {
-  "name": "moncon-web-frontend",
+  "name": "swarmsense-ui",
   "version": "0.0.1-alpha",
-  "description":
-    "A single page web application that works with any REST based moncon-backend.",
-  "keywords": ["moncon", "moncon-frontend", "web moncon", "moncon frontend"],
-  "bugs": "https://bitbucket.org/ba_mon/moncon/issues",
+  "description": "A single page web application that works with any REST based SwarmSense UI.",
+  "keywords": [
+    "swarmsense",
+    "swarmsense frontend"
+  ],
+  "bugs": "https://github.com/baseapp/SwarmSense-IoT-Platform/issues",
   "author": {
-    "name": "Hariom S.",
-    "email": "harry2office@gmail.com"
+    "name": "BaseApp Systems",
+    "email": "contact@baseapp.com"
   },
   "private": true,
   "dependencies": {
@@ -54,14 +56,13 @@
     "ps_user": "root",
     "ps_remote_address": "45.79.8.213",
     "ps_remote_directory": "/var/www/html/",
-    "build_docs": "on",
+    "build_docs": "off",
     "scp_on": "off"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "scripts/build_script.sh",
-    "docs":
-      "[ -f docs/API.md ] && rm docs/API.md ;documentation build src/index.js -f md -o docs/API.md; cd docs ; make clean; make html ; [ -d ../public/docs ] && rm -rf ../public/docs ;mv _build/html ../public/docs ; cd .. ;",
+    "docs": "[ -f docs/API.md ] && rm docs/API.md ;documentation build src/index.js -f md -o docs/API.md; cd docs ; make clean; make html ; [ -d ../public/docs ] && rm -rf ../public/docs ;mv _build/html ../public/docs ; cd .. ;",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
