@@ -394,10 +394,16 @@ class SensorHistory extends React.Component {
       if (this.state.data["fields"]) {
         let getColor = this.getColorIterator();
         let aggregate = this.state.data.aggregate || {};
+        for(var key in aggregate) {
+            if(aggregate.hasOwnProperty(key)) {
+              if (key.startsWith("mean") || key.startsWith("min") || key.startsWith("max"))
+                aggregate[key] = aggregate[key] ? parseFloat(aggregate[key]).toFixed(2) : undefined;
+            }
+        }
         graphs = this.state.data["fields"].map(f => {
-          let min = aggregate[`min_${f.name}`].toFixed(2) || 'NA',
-              max = aggregate[`max_${f.name}`].toFixed(2)  || 'NA',
-              mean = aggregate[`mean_${f.name}`].toFixed(2)  || 'NA';
+          let min = aggregate[`min_${f.name}`] || '--',
+              max = aggregate[`max_${f.name}`] || '--',
+              mean = aggregate[`mean_${f.name}`] || '--';
 
           let graph_id = f.title || f.name,
             options = {
