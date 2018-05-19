@@ -52,12 +52,8 @@
     "react-scripts": "^1.1.1"
   },
   "config": {
-    "pack_name": "snms-frontend-0.0.1-alpha",
-    "ps_user": "root",
-    "ps_remote_address": "45.79.8.213",
-    "ps_remote_directory": "/var/www/html/",
-    "build_docs": "off",
-    "scp_on": "off"
+    "pack_name": "swarmsense-ui",
+    "build_docs": "off"
   },
   "scripts": {
     "start": "react-scripts start",

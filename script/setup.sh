@@ -42,7 +42,7 @@ SUPER_SNMS_MQTT_CONF="${SCRIPTPATH}/configs/mqtt.conf"
 # Config file for rabbitmq
 RABBITMQ_CONFIG="${SCRIPTPATH}/configs/rabbitmq.config"
 
-SNMS_FRONTEND_ZIP="${SCRIPTPATH}/../frontend/snms.tar.bz2"
+SNMS_FRONTEND_ZIP="${SCRIPTPATH}/../frontend/swarmsense-ui.tar.bz2"
 
 LOG_DIR="/opt/snms/log"
 SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 18 | head -n 1)
@@ -411,10 +411,10 @@ install_frontend(){
     log "Installing frontend app at /var/www/snms/"
     cp $SNMS_FRONTEND_ZIP /var/www/snms/
     cd /var/www/snms/
-    tar -xf snms.tar.bz2
+    tar -xf swarmsense-ui.tar.bz2
     log "Adding API_URL to config.js"
     # echo "var API_URL = 'http://${NGINX_SERVER_NAME}/api'" > config.js
-    rm snms.tar.bz2
+    rm swarmsense-ui.tar.bz2
 }
 
 start_services(){
