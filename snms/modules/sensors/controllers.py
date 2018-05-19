@@ -133,7 +133,7 @@ def access_control(f):
                 if super_admin:
                     g.company_user_role = ROLE_ADMIN
                 return f(*args, **kwargs)
-            if g.user:
+            if g.get('user', None):
                 role = user_company_acl_role(g.user.id, company.id)
                 if role:
                     g.company_user_role = role
