@@ -24,6 +24,7 @@ import WebSettingsIcon from "material-ui/svg-icons/action/settings-applications"
 import AdminIcon from "material-ui/svg-icons/action/event-seat";
 import { cyan300 } from "material-ui/styles/colors";
 import CustomDashboardIcon from "material-ui/svg-icons/action/dashboard";
+import FileCloudIcon from 'material-ui/svg-icons/file/cloud';
 class Menu extends React.Component {
   constructor(props) {
     super(props);
@@ -79,7 +80,13 @@ class Menu extends React.Component {
             primaryText="Admin Settings"
             onClick={onMenuTap}
             leftIcon={<WebSettingsIcon color={cyan300} />}
-          />
+          />,
+            <MenuItem
+                href="/#/firmwares"
+                primaryText="OTA"
+                onClick={onMenuTap}
+                leftIcon={<FileCloudIcon color={cyan300} />}
+            />
         ]}
       />
     );
@@ -140,7 +147,7 @@ class Menu extends React.Component {
         <Divider />
         {logout}
         <Divider />
-        <div style={{ color: "grey", marginTop: "20px", fontSize: "0.9em" }}>
+        <div style={{ color: "grey", marginTop: "20px", fontSize: "0.9em", display: "none" }}>
           <div
             style={{
               textAlign: "center",

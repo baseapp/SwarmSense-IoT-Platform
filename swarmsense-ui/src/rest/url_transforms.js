@@ -81,6 +81,10 @@ let url_transforms = {
   sensor_events: {
     url: "sensors/sid/events",
     parameters: ["sid"]
+  },
+  firmwares: {
+    url: "ota/firmwares",
+    parameters: []
   }
 };
 

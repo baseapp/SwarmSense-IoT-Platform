@@ -81,6 +81,9 @@ import {
   UserProfile as Profile
 } from "./components";
 
+import {ListFirmwares, CreateFirmware, EditFirmware} from './components/ota'
+import customMessages from './translation'
+
 import { englishMessages } from "admin-on-rest";
 import * as domainMessages from "admin-on-rest/lib/i18n";
 import frenchMessages from "aor-language-french";
@@ -94,7 +97,7 @@ import spanishMessages from "aor-language-spanish";
 import vietnameseMessages from "aor-language-vietnamese";
 
 const messages = {
-  en: { ...englishMessages, ...domainMessages.en },
+  en: { ...englishMessages, ...domainMessages.en, ...customMessages.en },
   fr: { ...frenchMessages, ...domainMessages.fr },
   cn: { ...chineseMessages, ...domainMessages.cn },
   de: { ...germanMessages, ...domainMessages.de },
@@ -272,7 +275,14 @@ function MonconAdminApp({ postLoginInitials }) {
             create={CreateSensorEvents}
             edit={DeleteSensorEvents}
           />,
-          <Resource name="events_history" list={ListEventsHistory} />
+          <Resource name="events_history" list={ListEventsHistory} />,
+          <Resource
+             name="firmwares"
+             list={ListFirmwares}
+             create={CreateFirmware}
+             edit={EditFirmware}
+             remove={Delete}
+          />
         ];
       }}
     </Admin>

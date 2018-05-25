@@ -182,6 +182,21 @@ function rest_client(type, resource, params, useToken = true) {
           params = { ...params, data };
           options.body = params.data;
         } else if (
+            params["data"] &&
+            params["data"]["firmware"] &&
+            params["data"]["firmware"].length === 1
+        ) {
+            // Create Firmware, Send Multipart form request
+            let data = new FormData();
+            data.set("firmware", params.data.firmware[0].rawFile || null);
+            data.set("name", params.data.name);
+            data.set("version", params.data.version);
+            data.set("test_sensors", params.data.test_sensors);
+            data.set("sensor_type", params.data.sensor_type);
+            params = { ...params, data };
+            options.body = params.data;
+        }
+        else if (
           resource.includes("dashboards") &&
           resource.includes("companies") &&
           !resource.includes("widgets")
