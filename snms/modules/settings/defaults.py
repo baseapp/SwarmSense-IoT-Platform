@@ -11,7 +11,7 @@ default_options = [
     {
         'label': 'Site Title',
         'key': const.SETTING_SITE_TITLE,
-        'value': 'MonCon',
+        'value': 'SwarmSense',
         'access': 'public',
         'type': 'text',
         'group': 'site'
@@ -19,7 +19,7 @@ default_options = [
     {
         'label': 'Site Description',
         'key': const.SETTING_SITE_DESCRIPTION,
-        'value': 'MonCon',
+        'value': 'SwarmSense IoT',
         'access': 'public',
         'type': 'text',
         'group': 'site'
@@ -27,7 +27,7 @@ default_options = [
     {
         'label': 'Default Email From',
         'key': const.SETTING_EMAIL_FROM,
-        'value': 'moncon@baseapp.com',
+        'value': 'swarmsense@baseapp.com',
         'access': 'public',
         'type': 'text',
         'group': 'email'
@@ -35,7 +35,7 @@ default_options = [
     {
         'label': 'Email From Name',
         'key': const.SETTING_EMAIL_FROM_NAME,
-        'value': 'MonCon Support',
+        'value': 'SwarmSense Support',
         'access': 'public',
         'type': 'text',
         'group': 'email'
