@@ -61,6 +61,8 @@ class UserListResource(Resource):
         """
         order_by, order_type, offset, limit, filter = get_filters(in_request=request)
         users = User.query.filter(User.deleted == False).order_by(db.text(order_by + " " + order_type))
+        if 'q' in filter.keys():
+            users = users.filter(User.name.ilike("%{}%".format(filter['q'])))
         # TODO: Add filter on results.
         return {
             "data": [{
@@ -86,7 +88,7 @@ class UserListResource(Resource):
             return errors, 422
         user = User(name=args['name'], email=args['email'], uid=generate_uid(),
                     password=generate_password_hash(args['password']),
-                    role=args['role'], phone=args['phone'])
+                    role=args['role'], phone=args['phone'], is_verified=True)
 
         try:
             db.session.add(user)
