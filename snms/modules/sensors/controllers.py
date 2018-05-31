@@ -348,6 +348,9 @@ def post_sensor_values(sensor, args=None, now=None, from_mqtt=False):
             if sensor_types[sensor.type]['fields'][field_name]['type'] == 'file':
                 # File type field, save the file to another DB and get the ID or UUID
                 input_file = args[field_name]
+                if not input_file:
+                    del args[field_name]
+                    continue
                 file_uid = str(uuid.uuid4())
                 meta = {
                     'filename': input_file.filename,
