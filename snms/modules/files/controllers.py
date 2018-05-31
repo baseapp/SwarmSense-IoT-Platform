@@ -9,8 +9,7 @@ import werkzeug
 from flask import request, make_response
 from snms.modules.files import BinFile
 from snms.core.db import db
-from snms.modules.sensors import Sensor
-from snms.modules.sensors.controllers import access_control
+from snms.modules.sensors import Sensor, access_control
 
 
 class FileResource(Resource):
@@ -18,6 +17,7 @@ class FileResource(Resource):
     File Resource
     """
     decorators = [access_control]
+
     def get(self, sensor_id, uid):
         """get the saved file"""
         sensor = Sensor.query.filter(Sensor.uid == sensor_id).filter(Sensor.deleted == False).first()

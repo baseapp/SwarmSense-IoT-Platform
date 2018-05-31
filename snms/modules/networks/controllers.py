@@ -17,8 +17,7 @@ from snms.models import add_event_log
 from snms.core.db import db
 from snms.modules.networks import Network, network_sensor_table
 from snms.modules.companies import Company, company_required
-from snms.modules.sensors import Sensor
-from snms.modules.sensors.controllers import access_control
+from snms.modules.sensors import Sensor, access_control
 from snms.modules.sensors.schema import SensorRequestSchema
 from snms.common.auth import login_required
 from snms.utils import get_filters

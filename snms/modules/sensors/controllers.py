@@ -8,12 +8,11 @@
 # pylint: disable=invalid-name, import-error
 import uuid
 from functools import wraps
-from flask_restful import Api, Resource, reqparse
-from flask import g, request, Response, make_response, url_for
-from werkzeug.exceptions import Unauthorized, Forbidden, NotFound, InternalServerError
+from flask_restful import Resource, reqparse
+from flask import g, request, Response, url_for
+from werkzeug.exceptions import Forbidden, NotFound
 import datetime
 import werkzeug
-from sqlalchemy.types import String, Float, Integer
 import json
 from dateutil import parser
 import pytz
@@ -22,19 +21,15 @@ from snms.models import add_event_log
 from snms.database import tsdb
 from snms.core.db import db
 from snms.core.logger import Logger
-from snms.modules.companies import Company, company_required, user_company_acl_role
-from snms.modules.sensors import Sensor, get_all_types
+from snms.modules.companies import Company, user_company_acl_role
+from snms.modules.sensors import Sensor, get_all_types, access_control
 from .schema import SensorRequestSchema, ValueSchema
-from snms.common.auth import login_required
 from snms.utils import get_filters
 from snms.utils.check_alerts import process_sensor_alerts
-from snms.common.auth import DecodeError, parse_token, ExpiredSignature
-from snms.modules.users import User
-from snms.utils.crypto import get_random_string, generate_uid, generate_key
-from snms.modules.alerts import SensorAlertAssociation
+from snms.utils.crypto import generate_uid, generate_key
 from snms.modules.files import BinFile
 from snms.core.mqtt import mqtt
-from snms.const import ROLE_ADMIN, ROLE_READ, ROLE_WRITE
+from snms.const import ROLE_ADMIN, ROLE_READ
 
 _LOGGER = Logger.get()
 
@@ -61,86 +56,6 @@ def user_sensor_access(f):
                 g.company_user_role = role
             return f(*args, **kwargs)
         raise Forbidden()
-
-    return decorated_function
-
-
-def access_control(f):
-    """
-    Decorator to check for sensor access
-    :param f:
-    :return:
-    """
-
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        sensor_key = request.headers.get('X-Sensor-Key')
-        if not sensor_key:
-            sensor_key = request.args.get('sensor_key', None)
-
-        company_key = request.headers.get('X-Company-Key')
-        if not company_key:
-            company_key = request.args.get('company_key', None)
-
-        auth_header = request.headers.get('Authorization')
-
-        company_ids = []
-        super_admin = False
-        role = None
-        if auth_header:
-            try:
-                payload = parse_token(request)
-            except DecodeError:
-                raise Unauthorized('Token is invalid')
-            except ExpiredSignature:
-                raise Unauthorized('Token has expired')
-            if payload is None:
-                raise Unauthorized('Token is invalid')
-            g.user_id = payload['sub']
-            user_query = User.query.filter(User.id == g.user_id).filter(User.deleted == False)
-            user = user_query.first()
-            if user is None:
-                raise Forbidden('Unauthorized access')
-            g.user = user
-            # TODO: Update rest of the code.
-            if user.is_super_admin():
-                super_admin = True
-                role = ROLE_ADMIN
-                g.company_user_role = role
-
-        if 'sensor_id' in kwargs.keys():
-            sensor_uid = kwargs['sensor_id']
-            sensor = Sensor.query.filter(Sensor.uid == sensor_uid).filter(Sensor.deleted == False).first()
-            if sensor is None:
-                raise NotFound("Sensor not found")
-            g.sensor = sensor
-            if sensor.key == sensor_key or sensor.company.key == company_key or super_admin:
-                return f(*args, **kwargs)
-            if auth_header and g.user:
-                role = user_company_acl_role(g.user.id, sensor.company_id)
-                if role:
-                    g.company_user_role = role
-                    return f(*args, **kwargs)
-            raise Forbidden('Unauthorized access')
-
-        if 'company_id' in kwargs.keys():
-            company_id = kwargs['company_id']
-            company = Company.query.filter(Company.uid == company_id).filter(Company.deleted == False).first()
-            if company is None:
-                raise NotFound("Company Not Found")
-            if company.key == company_key or super_admin:
-                g.company_user_role = ROLE_WRITE
-                if super_admin:
-                    g.company_user_role = ROLE_ADMIN
-                return f(*args, **kwargs)
-            if g.get('user', None):
-                role = user_company_acl_role(g.user.id, company.id)
-                if role:
-                    g.company_user_role = role
-                    return f(*args, **kwargs)
-            raise Forbidden('Unauthorized access')
-
-        raise Forbidden('Unauthorized access')
 
     return decorated_function
 
