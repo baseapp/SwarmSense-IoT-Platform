@@ -24,6 +24,6 @@ company_user_acl = {
     }
 }
 
-from snms.modules.companies.controllers import user_company_acl_role, company_required
+from snms.modules.companies.middlewares import user_company_acl_role, company_required
 
 __all__ = ('Company', 'UserInvite', 'CompanyUserAssociation', 'company_user_acl', 'user_company_acl_role', 'company_required')

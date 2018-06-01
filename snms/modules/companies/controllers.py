@@ -5,76 +5,24 @@
 # License: www.baseapp.com/swarmsense-whitelabel-iot-platoform
 
 """Company Resources"""
-from functools import wraps
-import datetime
-
 from flask import render_template_string
-from flask_restful import Api, Resource, reqparse
-from flask import g, jsonify, Blueprint, request
+from flask_restful import Resource, reqparse
+from flask import g, request
 
 from snms.models import add_event_log
-from snms.database import tsdb
 from snms.core.db import db
 from snms.utils import get_filters
 from snms.core.logger import Logger
-from snms.modules.companies import Company, CompanyUserAssociation, UserInvite, company_user_acl
-from snms.modules.sensors import Sensor, get_all_types
-from snms.modules.networks import Network
-from snms.modules.alerts import Alert
+from snms.modules.companies import Company, CompanyUserAssociation, UserInvite, company_required
 from snms.modules.users import User
 from snms.common.auth import login_required
 from snms.utils.crypto import generate_uid, generate_key
 from snms.tasks import send_email
-from snms.const import ALERT_HISTORY_SERIES, DAILY_ANALYTICS_SERIES, \
-    EVENT_LOG_SERIES, C_ROLE_DEFAULT, ROLE_ADMIN, SETTING_TEMPLATE_INVITE_EMAIL
+from snms.const import C_ROLE_DEFAULT, ROLE_ADMIN, SETTING_TEMPLATE_INVITE_EMAIL
 from snms.core.options import options
 
 
 _LOGGER = Logger.get()
-
-
-def user_company_acl_role(user_id, company_id):
-    """Check if a user can access company"""
-    company_user = CompanyUserAssociation.query.filter(CompanyUserAssociation.user_id == user_id)\
-            .filter(CompanyUserAssociation.company_id == company_id).first()
-    if company_user:
-        role = company_user.role
-        if not role:
-            role = C_ROLE_DEFAULT
-        bp = request.blueprint
-        method = request.method
-        if method.upper() in company_user_acl[role]['methods'] and bp in company_user_acl[role]['blueprints']:
-            return role
-        else:
-            return None
-    else:
-        return None
-
-
-def company_required(f):
-    """
-    Decorater to check is user has access to a company or not
-    :param f:
-    :return:
-    """
-
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        company_id = kwargs['company_id']
-        company = Company.query.filter(Company.uid == company_id).filter(Company.deleted == False).first()
-        if company is None:
-            return {'message': 'Company not found', 'code': 404}, 404
-        user = g.user
-        if user.is_super_admin():
-            g.company_user_role = ROLE_ADMIN
-            return f(*args, **kwargs)
-        role = user_company_acl_role(user.id, company.id)
-        print(role)
-        if role:
-            g.company_user_role = role
-            return f(*args, **kwargs)
-        return {"message": "No Access", "code": 403}, 403
-    return decorated_function
 
 
 class CompaniesCollectionResource(Resource):
@@ -259,96 +207,3 @@ class CompanyUsersCollectionResource(Resource):
         except Exception as e:
             _LOGGER.error(e)
             return {}, 500
-
-
-class CompanyStatsResource(Resource):
-    method_decorators = [company_required, login_required]
-
-    def get(self, company_id):
-        """Get Company status"""
-
-        now = datetime.datetime.utcnow()
-        last_hr = now - datetime.timedelta(hours=1)
-        _LOGGER.info(last_hr)
-        company = Company.query.filter(Company.uid == company_id).filter(Company.deleted == False).first()
-        total_sensors = Sensor.query.filter(Sensor.company_id == company.id).filter(Sensor.deleted == False).count()
-        total_sensors_down = Sensor.query.filter(Sensor.company_id == company.id).filter(Sensor.deleted == False).filter(Sensor.is_down == True).count()
-        alert_logs = tsdb.get_points_raw(
-            ALERT_HISTORY_SERIES,
-            tags={'company_id': company_id},
-            order_by='time desc',
-            limit=10,
-            offset=0,
-            duration='1h',
-            count_only=True
-        )
-
-        all_types = get_all_types()
-        all_measurements = list(all_types.keys())
-        message_logs = tsdb.get_points_raw(
-            all_measurements,
-            tags={'company_id': company.id},
-            order_by='time desc',
-            limit=10,
-            offset=0,
-            duration='1h',
-            count_only=True
-        )
-        new_sensors = Sensor.query.filter(Sensor.company_id == company.id).filter(Sensor.deleted == False).filter(Sensor.created_at >= last_hr).count()
-        daily_hits = tsdb.get_points_raw(
-            DAILY_ANALYTICS_SERIES,
-            tags={'company_id': company_id},
-            order_by='time desc',
-            limit=100,
-            offset=0
-        )
-
-        return {
-            "devices_online": total_sensors - total_sensors_down,
-            "alerts_generated": alert_logs['total'],
-            "message_received": message_logs['total'],
-            "new_devices": new_sensors,
-            "daily_hits": daily_hits
-        }
-
-
-class EventLogResource(Resource):
-    """Event Log History Resources"""
-
-    method_decorators = [company_required, login_required]
-
-    def get(self, company_id):
-        """Get alert trigger history"""
-        order_by, order_type, offset, limit, filter = get_filters(in_request=request)
-
-        company = Company.query.filter(Company.uid == company_id).filter(Company.deleted == False).first()
-        tags = {"company_id": company.uid}
-        if "sensor_id" in filter.keys():
-            tags["sensor_id"] = filter["sensor_id"]
-        try:
-            return tsdb.get_points_raw(EVENT_LOG_SERIES, tags=tags, order_by='time desc', limit=limit, offset=offset)
-        except Exception as e:
-            _LOGGER.error(e)
-            return {'error': 'Server error'}, 500
-
-
-class DashboardResource(Resource):
-
-    method_decorators = [company_required, login_required]
-
-    def get(self, company_id):
-        company = Company.query.filter(Company.uid == company_id).filter(Company.deleted == False).first()
-        total_sensors = Sensor.query.filter(Sensor.company_id == company.id).filter(Sensor.deleted == False).count()
-        total_sensors_down = Sensor.query.filter(Sensor.company_id == company.id).filter(Sensor.deleted == False).filter(Sensor.is_down == True).count()
-        total_network = Network.query.filter(Network.company_id == company.id).filter(Network.deleted == False).count()
-        total_alerts = Alert.query.filter(Alert.company_id == company.id).filter(Alert.deleted == False).count()
-        event_logs = tsdb.get_points_raw(EVENT_LOG_SERIES, tags={'company_id': company_id}, order_by='time desc', limit=10, offset=0)
-
-        return {
-            "total_sensors": total_sensors,
-            "total_sensors_up": total_sensors - total_sensors_down,
-            "total_sensors_down": total_sensors_down,
-            "total_network": total_network,
-            "total_alerts": total_alerts,
-            "event_logs": event_logs['data']
-        }

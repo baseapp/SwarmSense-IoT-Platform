@@ -10,7 +10,8 @@ from flask import Blueprint
 from flask_restful import Api
 
 from snms.modules.companies.controllers import CompaniesCollectionResource, \
-    CompaniesResource, CompanyStatsResource, CompanyUsersCollectionResource, \
+    CompaniesResource, CompanyUsersCollectionResource
+from snms.modules.companies.dashboard_controller import CompanyStatsResource, \
     DashboardResource, EventLogResource
 
 _bp = Blueprint('companies', __name__)
