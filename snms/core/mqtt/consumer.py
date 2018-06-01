@@ -61,7 +61,17 @@ class EmqpConsumer(object):
         """
         LOGGER.info('Connecting to %s', self._url)
         return adapters.TornadoConnection(pika.URLParameters(self._url),
-                                          self.on_connection_open)
+                                          self.on_connection_open, self.on_connection_error)
+
+    def on_connection_error(self, connection, reply_text):
+        """This method is envoked on connection error"""
+        self._channel = None
+        if self._closing:
+            self._connection.ioloop.stop()
+        else:
+            LOGGER.warning('Connection error, reopening in 15 seconds: %s',
+                           reply_text)
+            self._connection.add_timeout(15, self.reconnect)
 
     def close_connection(self):
         """This method closes the connection to RabbitMQ."""

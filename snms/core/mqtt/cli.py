@@ -10,6 +10,7 @@ from flask import current_app
 from snms.core.logger import Logger
 from snms.core.mqtt import mqtt, MQTT_LOG_DEBUG
 from snms.core.mqtt.consumer import EmqpConsumer
+from snms.core.config import config
 from snms.modules.sensors.controllers import post_sensor_value_with_uid
 
 _LOGGER = Logger.get(__name__)
@@ -19,7 +20,10 @@ USE_RABBITMQ = True
 
 def mqtt_cmd(args):
     if USE_RABBITMQ:
-        amqp_url = "amqp://guest:guest@localhost:5672"
+        host = config.MQTT_BROKER_URL
+        username = config.MQTT_USERNAME
+        password = config.MQTT_PASSWORD
+        amqp_url = "amqp://{}:{}@{}:5672".format(username, password, host)
         consumer = EmqpConsumer(amqp_url, mqtt.app)
         consumer.run()
         return
