@@ -85,11 +85,8 @@ services:
     command: snms mqtt
 
   postfix:
-    image: juanluisbaptiste/postfix
+    image: mwader/postfix-relay
     container_name: swarmsense-postfix
     restart: always
     environment:
-      SMTP_SERVER: postfix
-      SMTP_USERNAME: root
-      SMTP_PASSWORD: root
-      SERVER_HOSTNAME: swarmsense.baseapp.com
+      POSTFIX_myhostname: swarmsense.baseapp.com
