@@ -1,0 +1,23 @@
+SecretKey = "a123ndom673458123"
+
+CeleryBroker = 'redis://redis:6379'
+
+SQLALCHEMY_DATABASE_URI = 'postgresql://snms_user:root@users-db:5432/snms_db'
+SQLALCHEMY_POOL_SIZE = 4
+Debug = False
+
+TempDir   = '/tmp'
+LOG_DIR = '/opt/snms/log/'
+
+Loggers = ['file']
+
+SINGLE_TENANT = False
+
+# MQTT Config
+MQTT_BROKER_URL = 'rabbitmq'
+MQTT_USERNAME = 'root'
+MQTT_PASSWORD = 'rAnDoMpA33'
+
+STORAGE_BACKENDS= {'default': 'fs:/opt/snms/archive'}
+
+TSDB_HOST = 'influxdb'
