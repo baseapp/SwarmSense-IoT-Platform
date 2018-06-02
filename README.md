@@ -40,3 +40,38 @@ All the application related files logs will be at `/opt/snms` directory.
 
 Checkout Here for more details about installation:
 https://www.baseapp.com/swarmsense/swarmsense-installation-guide/
+
+## Setup with Docker (Beta)
+
+Before proceeding, install the following prerequisites:
+
+- [Docker](https://docs.docker.com/install/)
+- [Docker compose](https://docs.docker.com/compose/install/)
+
+
+Once everything is installed, switch to the `docker` folder.
+
+First copy `snms.conf.example` to `snms.conf` and change `MQTT_PASSWORD`
+value for security.
+
+Now execute the following commands:
+
+```bash
+$ docker-compose up -d
+```
+
+This will build and start the container.
+
+Now for first time you have to create the database tables and default settings.
+Run the following command:
+
+```bash
+$ docker-compose run backend snms db prepare
+```
+
+To create the first admin user, run the following command.
+
+```bash
+$ docker-compose run backend snms user create -a -c
+```
+
