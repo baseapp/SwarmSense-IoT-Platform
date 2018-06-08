@@ -172,16 +172,6 @@ class WrapperComponent extends React.Component {
         <br />
         {show_sensor_type && sensor_type}
         {show_sensor_type && type}
-        <br />
-        {show_sensor_type && (
-          <TextField
-            floatingLabelText="Value"
-            onChange={(e, v) => {
-              this.props.value.input.onChange(v);
-            }}
-            value={this.props.value.input.value}
-          />
-        )}
       </div>
     );
   }

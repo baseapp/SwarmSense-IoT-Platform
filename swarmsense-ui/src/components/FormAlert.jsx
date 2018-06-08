@@ -238,6 +238,12 @@ function FormAlert(props) {
           ]}
         />
       </DependentInput>
+      <DependentInput
+        dependsOn="type"
+        resolve={type => (type === "geofencing" ? false : true)}
+      >
+        <TextInput source="value" />
+      </DependentInput>
       <TextInput source="name" />
       <TextInput source="alert_text" />
       <BooleanInput source="is_active" label="Is Active" />
