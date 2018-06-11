@@ -121,7 +121,7 @@ function MonconAdminApp({ postLoginInitials }) {
     <Admin
       dashboard={Dashboard}
       restClient={restClient}
-      title={window.application.settings.site_title || "Portal"}
+      title={window.application.settings.site_title || "SwarmSense"}
       authClient={authClient}
       locale="en"
       customRoutes={customRoutes}
