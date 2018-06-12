@@ -429,6 +429,8 @@ start_services(){
     systemctl start supervisor
     /etc/init.d/celerybeat start
     supervisorctl reload
+    service rabbitmq-server stop
+    service rabbitmq-server start
 }
 
 list_details(){
