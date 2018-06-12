@@ -21,9 +21,9 @@ if [ "$(id -u)" -ne 0 ] ; then
 	exit 1
 fi
 
-RABBITMQ_VERSION=3.6.12
-RABBITMQ_GITHUB_TAG=rabbitmq_v3_6_12
-RABBITMQ_DEBIAN_VERSION=3.6.12-1
+RABBITMQ_VERSION=3.7.5
+RABBITMQ_GITHUB_TAG=v3.7.5
+RABBITMQ_DEBIAN_VERSION=3.7.5-1
 
 CELERY_BEAT_TMP_FILE="${SCRIPTPATH}/configs/celerybeat"
 CELERYD_TMP_FILE="${SCRIPTPATH}/configs/celeryd"
@@ -40,7 +40,7 @@ SUPER_INIT="${SCRIPTPATH}/configs/supervisor"
 SUPER_SNMS_MQTT_CONF="${SCRIPTPATH}/configs/mqtt.conf"
 
 # Config file for rabbitmq
-RABBITMQ_CONFIG="${SCRIPTPATH}/configs/rabbitmq.config"
+RABBITMQ_CONFIG="${SCRIPTPATH}/configs/rabbitmq.conf"
 
 SNMS_FRONTEND_ZIP="${SCRIPTPATH}/../frontend/swarmsense-ui.tar.bz2"
 
@@ -114,6 +114,10 @@ install_postfix(){
 
 install_rabbitmq(){
     log "installing rabbitmq"
+    wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
+    sudo dpkg -i erlang-solutions_1.0_all.deb
+
+	apt-get update
     apt-get install -y  erlang-asn1 erlang-crypto erlang-eldap erlang-inets erlang-mnesia erlang-nox erlang-os-mon erlang-public-key erlang-ssl erlang-xmerl socat
     wget -O rabbitmq-server.deb.asc "https://github.com/rabbitmq/rabbitmq-server/releases/download/$RABBITMQ_GITHUB_TAG/rabbitmq-server_${RABBITMQ_DEBIAN_VERSION}_all.deb.asc"
     wget -O rabbitmq-server.deb     "https://github.com/rabbitmq/rabbitmq-server/releases/download/$RABBITMQ_GITHUB_TAG/rabbitmq-server_${RABBITMQ_DEBIAN_VERSION}_all.deb"
@@ -125,8 +129,8 @@ enable_rabbitmq(){
     rabbitmq-plugins enable rabbitmq_management
     rabbitmq-plugins enable rabbitmq_mqtt
     rabbitmq-plugins enable rabbitmq_web_mqtt
-    mkdir -p /usr/lib/rabbitmq/plugins
-    wget -O /usr/lib/rabbitmq/plugins/rabbitmq_auth_backend_http-3.6.12.ez https://dl.bintray.com/rabbitmq/community-plugins/rabbitmq_auth_backend_http-3.6.12.ez
+    # mkdir -p /usr/lib/rabbitmq/plugins
+    # wget -O /usr/lib/rabbitmq/plugins/rabbitmq_auth_backend_http-3.6.12.ez https://dl.bintray.com/rabbitmq/community-plugins/rabbitmq_auth_backend_http-3.6.12.ez
     rabbitmq-plugins enable rabbitmq_auth_backend_http
 }
 

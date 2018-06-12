@@ -4,13 +4,17 @@
 #
 # License: www.baseapp.com/swarmsense-whitelabel-iot-platoform
 
+"""
+Auth plugin for RabbitMQ
+"""
+
 from flask_restful import reqparse
 from flask_restful import Resource
 from flask import make_response
 
 from snms.core.logger import Logger
+from snms.core.config import config
 from snms.modules.sensors import Sensor
-from snms.modules.users import User
 from snms.modules.companies import Company
 _LOGGER = Logger.get(__name__)
 
@@ -29,6 +33,11 @@ class UserPathResource(Resource):
 
         username = args['username']
         password = args['password']
+
+        # Admin User
+        if username == config.MQTT_USERNAME and password == config.MQTT_PASSWORD:
+            return make_response("allow administrator")
+
         if username.startswith('sensor'):
             sensor_uid = username.split("_")[1]
             sensor = Sensor.query.filter(Sensor.uid == sensor_uid) \
@@ -51,7 +60,7 @@ class UserPathResource(Resource):
 
 
 class VhostPathResource(Resource):
-    """User login resource."""
+    """Vhost path resource."""
 
     parser = reqparse.RequestParser()
     parser.add_argument('username', type=str, required=True, help="Username is required")
@@ -59,11 +68,15 @@ class VhostPathResource(Resource):
     parser.add_argument('ip', type=str, required=True, help="Password is required")
 
     def post(self):
-        """User Login"""
+        """Check access for vhost to the user"""
         mqtt_vhost = '/'
         args = self.parser.parse_args()
         _LOGGER.debug(args)
         username = args['username']
+
+        if username == config.MQTT_USERNAME:
+            return make_response("allow")
+
         if username.startswith('sensor') or username.startswith('company'):
             if args['vhost'] == mqtt_vhost:
                 return make_response("allow")
@@ -75,7 +88,7 @@ class VhostPathResource(Resource):
 
 
 class ResourcePathResource(Resource):
-    """User login resource."""
+    """Resource Path resource."""
 
     parser = reqparse.RequestParser()
     parser.add_argument('username', type=str, required=True, help="Username is required")
@@ -85,12 +98,19 @@ class ResourcePathResource(Resource):
     parser.add_argument('permission', type=str, required=True, help="Permission is required")
 
     def post(self):
-        """User Login"""
+        """Check if user can access the resource."""
         args = self.parser.parse_args()
         _LOGGER.debug(args)
         username = args['username']
         resource = args['resource']
         name = args['name']
+
+        if name == 'amq.topic':
+            return make_response("allow")
+
+        if username == config.MQTT_USERNAME:
+            return make_response("allow")
+
         if username.startswith('sensor') and resource=='topic':
             sensor_uid = username.split("_")[1]
             if name == 'sensors/{}/values'.format(sensor_uid):
@@ -117,7 +137,7 @@ class ResourcePathResource(Resource):
 
 
 class TopicPathResource(Resource):
-    """User login resource."""
+    """Topic Auth resource. RabbitMQ 3.7 and higher"""
 
     parser = reqparse.RequestParser()
     parser.add_argument('username', type=str, required=True, help="Username is required")
@@ -130,5 +150,34 @@ class TopicPathResource(Resource):
     def post(self):
         args = self.parser.parse_args()
         _LOGGER.debug(args)
+        username = args['username']
+        resource = args['resource']
+        name = args['name']
+        routing_key = args['routing_key']
 
+        if username == config.MQTT_USERNAME:
+            return make_response("allow")
+
+        if username.startswith('sensor') and resource=='topic':
+            sensor_uid = username.split("_")[1]
+            if routing_key == 'sensors.{}.values'.format(sensor_uid):
+                return make_response("allow")
+            elif routing_key == 'sensors.{}.configuration'.format(sensor_uid):
+                return make_response("allow")
+            else:
+                _LOGGER.debug("Resource Denied: %s, %s" % (username, routing_key))
+                return make_response("deny")
+        elif username.startswith('company') and resource=='topic':
+            company_uid = username.split("_")[1]
+            company = Company.query.filter(Company.uid == company_uid).filter(Company.deleted == False).first()
+            try:
+                sensor_uid = routing_key.split('.')[1]
+            except:
+                return make_response("deny")
+            sensor = Sensor.query.filter(Sensor.uid == sensor_uid).filter(Sensor.deleted == False).first()
+            if company and sensor.company_id == company.id and routing_key.startswith('sensors.'):
+                return make_response("allow")
+            else:
+                _LOGGER.debug("Resource Denied: %s, %s" % (username, routing_key))
+                return make_response("deny")
         return make_response("allow")
