@@ -87,7 +87,7 @@ class SensorsCollectionResource(Resource):
             if data['value']:
                 value_fields = sensor_types[sensor.type]['fields']
                 for field_name, field in value_fields.items():
-                    if field['type'] == 'file':
+                    if field['type'] == 'file' and field_name in data['value'].keys():
                         data['value'][field_name] = url_for('files.fileresource', sensor_id=sensor.uid, uid=data['value'][field_name], sensor_key=sensor.key, _external=True) if data['value'][field_name] else ''
             result_sensors.append(data)
         return {"data": result_sensors, "total": sensors.count()}
