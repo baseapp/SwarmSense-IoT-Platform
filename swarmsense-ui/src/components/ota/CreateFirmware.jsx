@@ -26,7 +26,7 @@ function CreateFirmware(props) {
                 <ReferenceInput source="test_sensors" reference="company_sensors">
                     <SelectArrayInput optionText="name"/>
                 </ReferenceInput>
-                <FileInput source="firmware" label="Firmware File" accept="application/pdf" placeholder={<p>Drop your firmware file here</p>}>
+                <FileInput source="firmware" label="Firmware File" placeholder={<p>Drop your firmware file here</p>}>
                     <FileField source="src" title="title" />
                 </FileInput>
             </SimpleForm>
