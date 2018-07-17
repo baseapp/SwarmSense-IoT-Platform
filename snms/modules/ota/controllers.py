@@ -146,11 +146,20 @@ class FirmwareCheckResource(Resource):
                     sensor_uid = sensor.uid
         if not sensor_uid:
             sensor_uid = request.args.get('sensor_id', None)
+        sensor_hid = None
         if not sensor_uid:
-            return {"error": "Sensor id required"}, 404
-        sensor = Sensor.query.filter(Sensor.uid == sensor_uid).first()
+            sensor_hid = request.args.get('sensor_hid', None)
+            if not sensor_hid:
+                return {"error": "Sensor id required"}, 404
+        sensor = None
+        if sensor_uid:
+            sensor = Sensor.query.filter(Sensor.uid == sensor_uid).first()
+        else:
+            sensor = Sensor.query.filter(Sensor.hid == sensor_hid).first()
+            # TODO: Check for sensor type
         if not sensor:
             return {"error": "Sensor not found"}, 404
+        sensor_uid = sensor.uid
         _LOGGER.debug("Firmware Request {} {}".format(sensor_uid, version))
         firmware = Firmware.query.filter(Firmware.sensor_type == sensor.type).first()
         if not firmware:
