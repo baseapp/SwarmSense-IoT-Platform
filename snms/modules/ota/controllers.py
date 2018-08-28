@@ -163,11 +163,11 @@ class FirmwareCheckResource(Resource):
         _LOGGER.debug("Firmware Request {} {}".format(sensor_uid, version))
         firmware = Firmware.query.filter(Firmware.sensor_type == sensor.type).first()
         if not firmware:
-            return {}, 404
+            return {"error": "No firmware found for your device"}, 404
         if firmware.version == version:
-            return {"error": "New firmware not found"}, 404
+            return {"error": "Already up-to-date."}, 404
         if not firmware.is_deployed and sensor_uid not in firmware.test_sensors:
-            return {}, 404
+            return {"error": "No firmware for your device"}, 404
         try:
             return firmware.send()
         except Exception as e:
