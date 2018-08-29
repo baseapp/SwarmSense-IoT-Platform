@@ -77,11 +77,13 @@ def access_control(f):
         if 'sensor_hid' in kwargs.keys() and 'company_id' in kwargs.keys():
             sensor_hid = kwargs['sensor_hid']
             company_id = kwargs['company_id']
-            sensor = Sensor.query.filter(Sensor.hid == sensor_hid).filter(Sensor.company_id == company_id).filter(Sensor.deleted == False).first()
+            company = Company.query.filter(Company.uid == company_id).filter(Company.deleted == False).first()
+
+            sensor = Sensor.query.filter(Sensor.hid == sensor_hid).filter(Sensor.company_id == company.id).filter(Sensor.deleted == False).first()
             if sensor is None:
                 raise NotFound("Sensor not found")
             g.sensor = sensor
-            if sensor.key == sensor_key or sensor.company.key == company_key or super_admin:
+            if sensor.key == sensor_key or company.key == company_key or super_admin:
                 return f(*args, **kwargs)
             if auth_header and g.user:
                 role = user_company_acl_role(g.user.id, sensor.company_id)
