@@ -444,13 +444,14 @@ class SensorHistoryResource(Resource):
     """Sensor value history resource"""
     method_decorators = [access_control]
 
-    def get(self, sensor_id):
+    def get(self, sensor_id=None, sensor_hid=None, company_id=None):
         """
         Get sensor value history.
         :param sensor_id: Sensor ID
         """
         order_by, order_type, offset, limit, filter = get_filters(in_request=request)
-        sensor = Sensor.query.filter(Sensor.uid == sensor_id).filter(Sensor.deleted == False).first()
+
+        sensor = g.sensor
         duration = None
         start_date = None
         end_date = None

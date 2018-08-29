@@ -47,7 +47,10 @@ _api.add_resource(SensorConfigResource, '/sensors/<string:sensor_id>/configurati
 _api.add_resource(SensorHIDConfigResource, '/companies/<string:company_id>/sensor_by_hid/<string:sensor_hid>/configuration')
 _api.add_resource(SensorHIDConfigAck, '/companies/<string:company_id>/sensor_by_hid/<string:sensor_hid>/configuration/ack')
 _api.add_resource(SensorValueResource, '/sensors/<string:sensor_id>/values')
-_api.add_resource(SensorHistoryResource, '/sensors/<string:sensor_id>/history')
+_api.add_resource(SensorHistoryResource, 
+                  '/sensors/<string:sensor_id>/history',
+                  '/companies/<string:company_id>/sensor_by_hid/<string:sensor_hid>/history'
+                  )
 _api.add_resource(SensorDataExportResource, '/sensors/<string:sensor_id>/export')
 _api.add_resource(SensorAggregateResource, '/sensors/<string:sensor_id>/aggregate')
 
