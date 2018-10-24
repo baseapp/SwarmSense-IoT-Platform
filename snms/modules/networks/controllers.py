@@ -179,6 +179,8 @@ class NetworksSensorsCollectionResource(Resource):
         sensors = Sensor.query.join(Network.sensors).filter(Network.uid == network_id).filter(Sensor.deleted == False)
         if 'q' in filter.keys():
             sensors = sensors.filter(Sensor.name.ilike("%{}%".format(filter['q'])))
+        if order_by in ['id', 'uid', 'type', 'description', 'name', 'last_update', 'created_at', 'is_down']:
+            sensors = sensors.order_by(db.text(order_by + " " + order_type))
         count = sensors.count()
         result_sensors = []
         for sensor in sensors[offset:offset + limit]:
