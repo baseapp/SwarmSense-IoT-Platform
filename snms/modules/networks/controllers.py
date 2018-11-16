@@ -180,7 +180,7 @@ class NetworksSensorsCollectionResource(Resource):
         if 'q' in filter.keys():
             sensors = sensors.filter(Sensor.name.ilike("%{}%".format(filter['q'])))
         if order_by in ['id', 'uid', 'type', 'description', 'name', 'last_update', 'created_at', 'is_down']:
-            sensors = sensors.order_by(db.text(order_by + " " + order_type))
+            sensors = sensors.order_by(db.text("sensors." + order_by.strip() + " " + order_type))
         count = sensors.count()
         result_sensors = []
         for sensor in sensors[offset:offset + limit]:
