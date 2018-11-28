@@ -109,7 +109,7 @@ class InfluxClient(TSDBClient):
         group_by_clause = None
         order_by_clause = None
 
-        select_clause_min_max = "SELECT MIN(*), MAX(*), MEAN(*)"
+        select_clause_min_max = "SELECT MIN(*), MAX(*), MEAN(*), COUNT(*)"
         select_clause = "SELECT *::field"
         select_clause_count = "SELECT COUNT(*)"
 
