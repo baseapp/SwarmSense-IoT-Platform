@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -398,12 +398,15 @@ class SensorHistory extends React.Component {
             if(aggregate.hasOwnProperty(key)) {
               if (key.startsWith("mean") || key.startsWith("min") || key.startsWith("max"))
                 aggregate[key] = aggregate[key] ? parseFloat(aggregate[key]).toFixed(2) : undefined;
+              if (key.startsWith("count"))
+                aggregate[key] = aggregate[key] ? parseInt(aggregate[key]) : undefined;
             }
         }
         graphs = this.state.data["fields"].map(f => {
           let min = aggregate[`min_${f.name}`] || '--',
               max = aggregate[`max_${f.name}`] || '--',
-              mean = aggregate[`mean_${f.name}`] || '--';
+              mean = aggregate[`mean_${f.name}`] || '--',
+              count = aggregate[`count_${f.name}`] || '--';
 
           let graph_id = f.title || f.name,
             options = {
@@ -411,7 +414,7 @@ class SensorHistory extends React.Component {
                 text: f.title || f.name
               },
               subtitle: {
-                text: `Min: ${min}, Max: ${max}, Mean: ${mean}`
+                text: `Min: ${min}, Max: ${max}, Mean: ${mean}, Count: ${count}`
               },
               series: [
                 {
