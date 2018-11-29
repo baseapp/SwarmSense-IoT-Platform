@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -154,6 +154,7 @@ export class SensorsByTypeList extends React.Component {
           perPage={perPage}
           title={title}
           actions={<ActionPanel customButtons={customButtons} />}
+          sort={{ order: "DESC", field: "last_update" }}
         >
           {view}
         </List>
