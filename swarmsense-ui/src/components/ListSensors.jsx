@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -380,7 +380,21 @@ class SensorsList extends React.Component {
                   <SimpleList
                     onEditItem={record => set_params("sensor", record)}
                     editItems={editItems}
-                    primaryText={record => `${record.name}`}
+                    primaryText={record => {
+                      return (
+                        <a
+                          style={linkStyle}
+                          onClick={() => {
+                            set_params("sensors", []);
+                            set_params("multiple", false);
+                            set_params("sensor", record);
+                          }}
+                          href="#/sensor_chart"
+                        >
+                          {record.name}
+                        </a>
+                      );
+                    }}
                     leftCheckbox={record => {
                       return (
                         <Checkbox

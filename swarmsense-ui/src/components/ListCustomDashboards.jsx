@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -102,7 +102,29 @@ class MyDashboard extends React.Component {
               <Responsive
                 small={
                   <SimpleList
-                    primaryText={record => `${record.data.name}`}
+                    primaryText={record => {
+                      return (
+                        record.dashboard_type === "device-general" ? (
+                          <a
+                            style={linkStyle}
+                            onClick={() =>
+                              this.setState({
+                                ...this.state,
+                                select_sensor: true,
+                                dashboard_id: record.id,
+                                sensor_type: record.sensor_type
+                              })
+                            }
+                          >
+                            {record.data.name}
+                          </a>
+                        ) : (
+                          <a style={linkStyle} href={`/#/cdash/${record.id}`}>
+                            {record.data.name}
+                          </a>
+                        )
+                      );
+                    }}
                     onEditItem={record => set_params("cdashboard", record)}
                     editItems={editItems}
                     menuItems={record => {
