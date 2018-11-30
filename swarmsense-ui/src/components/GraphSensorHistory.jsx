@@ -60,6 +60,10 @@ const styles = {
     maxHeight: 150,
     overflowY: "auto",
     overflowX: "auto"
+  },
+  container: {
+    textAlign: "right",
+    marginRight: "25px"
   }
 };
 
@@ -84,7 +88,8 @@ class SensorHistory extends React.Component {
       redraw_charts: false,
       updates_data: [],
       realtime_allow: false,
-      displayUpdates: false
+      displayUpdates: false,
+      style: {display: 'none'},
     };
     this.mqtt_client = null;
     this.logger = get_logger("GraphSensorHistory", true);
@@ -493,6 +498,8 @@ class SensorHistory extends React.Component {
                 {!this.state.realtime_allow && (
                   <FlatButton
                     primary
+                    style={{height: '37px'}}
+                    labelStyle={{paddingTop: '1px'}}
                     label={
                       this.state.show_dates ? "Hide Filter" : "Show Filter"
                     }
@@ -684,6 +691,23 @@ class SensorHistory extends React.Component {
             })}
           </GridList>
         </div>
+        <div style={styles.container}>
+        <RaisedButton
+          label="Reset Zoom"
+          style={this.state.style}
+          primary
+          onClick={() => {
+            let { from_date, to_date } = this.getInitialDates(false);
+            this.setState(
+              { ...this.state, from_date, to_date, loading: true },
+              () => {
+                this.update_charts(true, true);
+                this.setState({ ...this.state, loading: false, style: {display: 'none'} });
+              }
+            );
+          }}
+        />
+        </div>
         <GraphArea
           loading={this.state.loading}
           data_version={this.state.version}
@@ -698,7 +722,7 @@ class SensorHistory extends React.Component {
             if (!this.state.realtime_allow) {
               let from_date = new Date(min),
                 to_date = new Date(max);
-              this.setState({ ...this.state, from_date, to_date }, () => {
+              this.setState({ ...this.state, from_date, to_date, style: {} }, () => {
                 this.update_charts(true, true);
               });
             }
