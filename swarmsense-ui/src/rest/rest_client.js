@@ -5,7 +5,7 @@
  *
  * License: www.baseapp.com/swarmsense-whitelabel-iot-platoform
  */
- 
+
 import {
   GET_LIST,
   GET_ONE,
@@ -203,7 +203,7 @@ function rest_client(type, resource, params, useToken = true) {
         ) {
           let _data = {
             ...params.data,
-            sensor_type: params.data.sensor_type.toString()
+            sensor_type: params.data.sensor_type ? params.data.sensor_type.toString() : ""
           };
           options.body = JSON.stringify(_data);
         } else {
