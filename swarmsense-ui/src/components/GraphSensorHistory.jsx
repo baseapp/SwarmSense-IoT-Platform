@@ -430,7 +430,12 @@ class SensorHistory extends React.Component {
                     if (!isNaN(d[f.name])) {
                       y = d[f.name];
                     } else if (!isNaN(d[`mean_${f.name}`])) {
-                      y = d[`mean_${f.name}`];
+                        if (d[`mean_${f.name}`]) {
+                          y = d[`mean_${f.name}`].toFixed(window.application.settings.decimal_point ? window.application.settings.decimal_point : 2);
+                          y = Number(y);
+                        } else {
+                          y = d[`mean_${f.name}`];
+                        }
                     } else {
                       y = null;
                     }
