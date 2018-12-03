@@ -201,10 +201,18 @@ function rest_client(type, resource, params, useToken = true) {
           resource.includes("companies") &&
           !resource.includes("widgets")
         ) {
-          let _data = {
-            ...params.data,
-            sensor_type: params.data.sensor_type ? params.data.sensor_type.toString() : ""
-          };
+          let _data;
+          if (params.data.dashboard_type !== "device-general") {
+            _data = {
+              ...params.data,
+              sensor_type: params.data.sensor_type ? params.data.sensor_type.toString() : ""
+            };
+          } else {
+            _data = {
+              ...params.data,
+              sensor_type: params.data.sensor_type.toString()
+            };
+          }
           options.body = JSON.stringify(_data);
         } else {
           options.body = JSON.stringify(params.data);
