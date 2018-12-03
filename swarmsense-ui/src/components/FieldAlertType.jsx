@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -63,6 +63,8 @@ class WrapperComponent extends React.Component {
       >
         <MenuItem value="lt" primaryText="Less Than" />
         <MenuItem value="lte" primaryText="Less Than or Equal To" />
+        <MenuItem value="eq" primaryText="Equal To" />
+        <MenuItem value="neq" primaryText="Not Equal To" />
         <MenuItem value="gt" primaryText="Greater Than" />
         <MenuItem value="gte" primaryText="Greater Than or Equal To" />
       </SelectField>
