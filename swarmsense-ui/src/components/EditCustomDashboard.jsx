@@ -23,15 +23,26 @@ import { DependentInput } from "aor-dependent-input";
  * @param  {Object} props
  * @return {React.Node}
  */
+const required = value => value ? undefined : 'Title is Required';
+const validateTitle = required;
 
 function EditMyDashboard(props) {
+  const validateUserUpdate = (values) => {
+    const errors = {};
+    if (!values.sensor_type) {
+        errors.sensor_type = ['The Sensor Type is required'];
+    }
+    return errors
+  };
+
   return (
     <Edit {...props}>
       <SimpleForm
         defaultValue={{ id: "", data: {}, dashboard_type: "general" }}
+        validate={validateUserUpdate}
       >
         <DisabledInput source="id" />
-        <TextInput source="data.name" label="title" />
+        <TextInput source="data.name" label="title" validate={validateTitle}/>
         <SelectInput
           label="Type"
           source="dashboard_type"
