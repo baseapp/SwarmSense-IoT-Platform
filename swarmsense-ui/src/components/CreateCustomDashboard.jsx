@@ -25,8 +25,18 @@ import LinearProgress from "material-ui/LinearProgress";
  * @param  {Object} props
  * @return {React.Node}
  */
+const required = value => value ? undefined : 'Title is Required';
+const validateTitle = required;
 
 function CreateMyDashboard(props) {
+  const validateUserCreation = (values) => {
+    const errors = {};
+    if (!values.sensor_type) {
+        errors.sensor_type = ['The Sensor Type is required'];
+    }
+    return errors
+  };
+
   return (
     <Create
       {...props}
@@ -34,8 +44,8 @@ function CreateMyDashboard(props) {
         name: ""
       }}
     >
-      <SimpleForm redirect="list" defaultValue={{ dashboard_type: "general" }}>
-        <TextInput source="data.name" label="title" />
+      <SimpleForm redirect="list" defaultValue={{ dashboard_type: "general" }} validate={validateUserCreation} >
+        <TextInput source="data.name" label="title" validate={validateTitle}/>
         <SelectInput
           label="Type"
           source="dashboard_type"
