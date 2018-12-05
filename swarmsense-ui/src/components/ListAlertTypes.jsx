@@ -9,6 +9,7 @@ import React from "react";
 import {
   List,
   Datagrid,
+  BooleanField,
   TextField,
   FunctionField,
   Responsive
@@ -116,7 +117,7 @@ export class AlertsTypeList extends React.Component {
                         <a
                           style={linkStyle}
                           onClick={() => {
-                            set_params("alert", record);
+                            set_params("alert", record.id);
                           }}
                           href="#/alert_history"
                         >
@@ -130,7 +131,7 @@ export class AlertsTypeList extends React.Component {
                   <TextField source="snooze" />
                   <TextField source="type" />
                   <TextField source="value" />
-
+                  <BooleanField source="is_active" label="active" />
                   {editItems && (
                     <EditButton
                       onClick={record => set_params("alert", record)}
