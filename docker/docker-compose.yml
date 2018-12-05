@@ -72,6 +72,7 @@ services:
       - ./enabled_plugins:/etc/rabbitmq/enabled_plugins
     ports:
       - 1883:1883
+      - 15675:15675
 
   mqtt-adapter:
     image: swarmsense/backend:latest
