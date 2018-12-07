@@ -9,6 +9,7 @@ import React from "react";
 import {
   SimpleForm,
   TextInput,
+  NumberInput,
   LongTextInput,
   BooleanInput,
   SelectInput
@@ -213,6 +214,7 @@ function FormAlert(props) {
         }
       }}
     >
+      <TextInput source="name" />
       <FieldAlertType />
       <DependentInput
         dependsOn="type"
@@ -245,13 +247,13 @@ function FormAlert(props) {
       >
         <TextInput source="value" />
       </DependentInput>
-      <TextInput source="name" />
       <LongTextInput
         source="alert_text"
         elStyle={{ border: "solid 1px grey", padding: "5px" }}
         options={{ rows: 5, underlineShow: false }}
       />
       <BooleanInput source="is_active" label="Is Active" />
+      <NumberInput source="threshold_duration" label="Threshold duration" defaultValue="0" />
       <TextInput source="snooze" />
       <DependentInput
         dependsOn="type"
