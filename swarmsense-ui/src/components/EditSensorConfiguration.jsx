@@ -33,6 +33,7 @@ class SensorConfigurationEdit extends React.Component {
     this.state = {
       isLoading: true,
       data: [],
+      sensor_config: [],
       sensor_type: undefined,
       snackbar: {
         error: false,
@@ -114,19 +115,20 @@ class SensorConfigurationEdit extends React.Component {
    * @returns {Promise} resolves into the sensor-configuration info
    */
   get_sensor_config_information() {
-    let { sensor: { type, config: sensor_config } } = this.props;
+    let { sensor: { type, config: sensor_config, id: id } } = this.props;
     return restClient("GET_ONE", "sensor_types_all", { id: type }).then(
       ({ data: { config_fields: config } }) => {
-        let data = [];
-        Object.getOwnPropertyNames(config).map(config_name => {
-          let _config = { name: config_name, type: config[config_name] };
-          if (sensor_config.hasOwnProperty(config_name)) {
-            _config.value = sensor_config[config_name];
-          }
-          data.push(_config);
+        restClient("GET_ONE", "companies/cid/sensors", { id: id}).then( response => {
+          let data = [];
+          Object.getOwnPropertyNames(config).map(config_name => {
+            let _config = { name: config_name, type: config[config_name] };
+            if (sensor_config.hasOwnProperty(config_name)) {
+                _config.value = response.data.config[config_name];
+                data.push(_config);
+                this.setState({ ...this.state, data: data, isLoading: false  });
+            }
+          });
         });
-        console.log(data);
-        this.setState({ ...this.state, data: data });
       }
     );
   }
@@ -206,7 +208,7 @@ class SensorConfigurationEdit extends React.Component {
     let { sensor: { id: sid, type } } = this.props;
     if (sid) {
       this.get_sensor_config_information().then(() => {
-        this.setState({ ...this.state, isLoading: false });
+        //this.setState({ ...this.state, isLoading: false });
       });
     }
   }
