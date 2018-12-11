@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -18,7 +18,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { moments_ago, set_params } from "../utils";
 import { SimpleList, ActionPanel } from "./index";
-
+import PostPagination from "./PostPagination";
 /**
  * Make the list of event's history.
  * @extends React.Component
@@ -44,6 +44,7 @@ class ListEventsHistory extends React.Component {
             ]}
           />
         }
+        pagination={<PostPagination />}
       >
         <Responsive
           small={

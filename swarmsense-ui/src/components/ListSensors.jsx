@@ -32,6 +32,7 @@ import { rest_client as restClient, getDashboards } from "../rest";
 import { resolveIfCompany } from "../utils";
 import Forwarder from "./Forwarder";
 import InjectParams from "./InjectParams";
+import PostPagination from "./PostPagination";
 
 export /**
  * Makes the list of sensors.
@@ -372,6 +373,7 @@ class SensorsList extends React.Component {
           sort={{ field: "last_update", order: "DESC" }}
           filters={<SensorFilter />}
           actions={<ActionPanel customButtons={customButtons} />}
+          pagination={<PostPagination />}
         >
           {permissions => {
             return (

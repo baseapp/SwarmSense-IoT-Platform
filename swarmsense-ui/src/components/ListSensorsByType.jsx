@@ -20,6 +20,7 @@ import { rest_client as restClient } from "../rest";
 import { resolveIfSensorType } from "../utils";
 import Forwarder from "./Forwarder";
 import InjectParams from "./InjectParams";
+import PostPagination from "./PostPagination";
 
 export class SensorsByTypeList extends React.Component {
   constructor(props) {
@@ -155,6 +156,7 @@ export class SensorsByTypeList extends React.Component {
           title={title}
           actions={<ActionPanel customButtons={customButtons} />}
           sort={{ order: "DESC", field: "last_update" }}
+          pagination={<PostPagination />}
         >
           {view}
         </List>

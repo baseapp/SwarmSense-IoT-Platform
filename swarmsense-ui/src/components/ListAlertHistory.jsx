@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -20,6 +20,8 @@ import { SimpleList } from "./index";
 import { resolveIfCompany, resolveIfAlert } from "../utils";
 import Forwarder from "./Forwarder";
 import InjectParams from "./InjectParams";
+import PostPagination from "./PostPagination";
+
 function AlertHistory(props) {
   let SensorFilter = props => (
     <Filter {...props}>
@@ -45,7 +47,7 @@ function AlertHistory(props) {
     fontSize: "0.93rem"
   };
   return (
-    <List {...props} title={title} filters={<SensorFilter />} filter={filter}>
+    <List {...props} title={title} filters={<SensorFilter />} filter={filter} pagination={<PostPagination />}>
       <Responsive
         small={
           <SimpleList

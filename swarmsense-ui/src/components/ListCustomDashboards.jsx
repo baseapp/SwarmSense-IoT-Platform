@@ -26,6 +26,7 @@ import { SimpleList, ActionPanel } from "./index.js";
 import { set_params, moments_ago, resolveIfCompany } from "../utils";
 import { getSensors, rest_client as restClient } from "../rest";
 import EditButton from "./EditButton";
+import PostPagination from "./PostPagination";
 class SensorType extends React.Component {
   // SensorType component for getting name of the sensor.
   constructor(props) {
@@ -95,6 +96,7 @@ class MyDashboard extends React.Component {
           perPage={30}
           title="Custom Dashboards"
           actions={<ActionPanel />}
+          pagination={<PostPagination />}
         >
           {permissions => {
             const editItems = permissions === "read" ? false : true;

@@ -23,6 +23,7 @@ import { resolveIfCompany } from "../utils";
 import Forwarder from "./Forwarder";
 import InjectParams from "./InjectParams";
 import EditButton from "./EditButton";
+import PostPagination from "./PostPagination";
 
 export class AlertsTypeList extends React.Component {
   // For listing the alert types
@@ -76,6 +77,7 @@ export class AlertsTypeList extends React.Component {
         title={title}
         perPage={20}
         actions={<ActionPanel customButtons={customButtons} />}
+        pagination={<PostPagination />}
       >
         {permissions => {
           let editItems = permissions === "read" ? false : true;

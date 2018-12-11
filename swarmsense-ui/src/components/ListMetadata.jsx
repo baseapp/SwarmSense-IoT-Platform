@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -9,9 +9,10 @@ import React from "react";
 import { List, Datagrid, TextField } from "admin-on-rest";
 import { Responsive } from "admin-on-rest";
 import { SimpleList } from "./index";
+import PostPagination from "./PostPagination";
 
 const MetadataList = props => (
-  <List {...props} title="User settings">
+  <List {...props} title="User settings" pagination={<PostPagination />}>
     <Responsive
       small={
         <SimpleList primaryText={record => `${record.key} : ${record.value}`} />

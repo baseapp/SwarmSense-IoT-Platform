@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -11,6 +11,7 @@ import { Responsive } from "admin-on-rest";
 import EditButton from "./EditButton";
 import { SimpleList, ActionPanel } from "./index";
 import { set_params } from "../utils";
+import PostPagination from "./PostPagination";
 
 /**
  * @example <CompaniesList/>
@@ -19,7 +20,7 @@ import { set_params } from "../utils";
 class CompaniesList extends React.Component {
   render() {
     return (
-      <List {...this.props} perPage={10} actions={<ActionPanel />}>
+      <List {...this.props} perPage={10} actions={<ActionPanel />} pagination={<PostPagination />}>
         {permissions => {
           // console.log("permissions", permissions);
           let editItems = permissions === "read" ? false : true;

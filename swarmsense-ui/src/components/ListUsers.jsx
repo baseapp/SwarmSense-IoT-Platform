@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -20,6 +20,7 @@ import { SimpleList, LoginAs, ActionPanel } from "./index";
 import EditButton from "./EditButton";
 import { set_params } from "../utils";
 import UserFilter from "./FilterUser_name";
+import PostPagination from "./PostPagination";
 let UserList = props => {
   return (
     <List
@@ -28,6 +29,7 @@ let UserList = props => {
       title="System-wide users"
       filters={<UserFilter />}
       actions={<ActionPanel />}
+      pagination={<PostPagination />}
     >
       <Responsive
         small={

@@ -24,6 +24,7 @@ import { resolveIfCompany } from "../utils";
 import Forwarder from "./Forwarder";
 import InjectParams from "./InjectParams";
 import EditButton from "./EditButton";
+import PostPagination from "./PostPagination";
 /**
  * @name NetworksList
  * @description View to list all the networks for the current company
@@ -37,7 +38,7 @@ let NetworksList = props => {
     fontSize: "0.93rem"
   };
   return (
-    <List {...props} title="Networks" actions={<ActionPanel />}>
+    <List {...props} title="Networks" actions={<ActionPanel />} pagination={<PostPagination />}>
       {permissions => {
         const editItems = permissions === "read" ? false : true;
         return (
