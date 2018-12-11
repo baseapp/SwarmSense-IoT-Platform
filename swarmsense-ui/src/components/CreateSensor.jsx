@@ -12,7 +12,8 @@ import {
   SimpleForm,
   TextInput,
   SelectInput,
-  ReferenceInput
+  ReferenceInput,
+  SaveButton
 } from "admin-on-rest";
 import { set_params } from "../utils";
 import { FieldLatLng as LatLongField } from "./index";
@@ -23,6 +24,7 @@ function SensorsCreate(props) {
       <SimpleForm
         defaultValue={{ location_lat: 0, location_long: 0 }}
         redirect="list"
+        toolbar={<SaveButton label="Create" />}
       >
         <TextInput source="name" />
         <ReferenceInput
@@ -33,6 +35,7 @@ function SensorsCreate(props) {
         >
           <SelectInput optionText="title" optionValue="type" />
         </ReferenceInput>
+        <TextInput source="hid" label="Serial Number(HID)" />
         <LatLongField />
       </SimpleForm>
     </Create>

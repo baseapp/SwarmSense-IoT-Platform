@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -16,7 +16,7 @@ import { Filter, TextInput } from "admin-on-rest";
 function SensorFilter(props) {
   return (
     <Filter {...props}>
-      <TextInput source="q" label="Sensor-name" alwaysOn />
+      <TextInput source="q" label="Search(Sensor-name)" alwaysOn />
     </Filter>
   );
 }
