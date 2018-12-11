@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -124,7 +124,7 @@ class Login extends React.Component {
                 />
                 <RaisedButton
                   style={{ marginBottom: "2px" }}
-                  label="Can't Login ?!"
+                  label="Forgot password?"
                   onClick={() => this.props.changeView("recover-password")}
                   fullWidth
                   primary
