@@ -11,6 +11,7 @@ import Leaflet from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Map, Marker, Popup, TileLayer } from "react-leaflet";
 import FlatButton from "material-ui/FlatButton";
+import {SimpleForm, TextInput} from "admin-on-rest";
 import "./leaflet.css";
 
 Leaflet.Icon.Default.imagePath =
@@ -62,6 +63,18 @@ class LatLongInput extends React.Component {
     let { latlng: { lat: new_lat, lng: new_long } } = ev;
     this.setPosition(new_lat, new_long);
   }
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(location => {
+      this.setState({
+        ...this.state,
+        marker_lat: Number.parseFloat(location.coords.latitude),
+        marker_long: Number.parseFloat(location.coords.longitude),
+        reset_lat: Number.parseFloat(location.coords.latitude),
+        reset_long: Number.parseFloat(location.coords.longitude)
+      })
+    });
+  }
+
   render() {
     let { marker_lat: lat, marker_long: long, zoom } = this.state;
     let position =
