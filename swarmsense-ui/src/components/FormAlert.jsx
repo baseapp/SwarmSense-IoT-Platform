@@ -249,10 +249,8 @@ function FormAlert(props) {
       </DependentInput>
       <LongTextInput
         source="alert_text"
-        elStyle={{ border: "solid 1px grey", padding: "5px" }}
-        options={{ rows: 5, underlineShow: false }}
       />
-      <BooleanInput source="is_active" label="Is Active" />
+      <BooleanInput source="is_active" label="Is Active" style={{position: 'absolute', right: '5%', top: '20%'}} />
       <NumberInput source="threshold_duration" label="Threshold duration" defaultValue="0" />
       <TextInput source="snooze" />
       <DependentInput
