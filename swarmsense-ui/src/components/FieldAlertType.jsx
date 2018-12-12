@@ -21,7 +21,8 @@ class WrapperComponent extends React.Component {
       geofencing: this.props.type.input.value === "geofencing" ? true : false,
       sensor_types: {},
       sensor_type_selected: null,
-      sensor_type_field_selected: null
+      sensor_type_field_selected: null,
+      value: 0
     };
   }
   componentWillReceiveProps(newProps) {
@@ -51,6 +52,19 @@ class WrapperComponent extends React.Component {
       throw err; // improvise
     }
   }
+  handleChange = (event, index, value) => this.setState({ ...this.state, value: value });
+
+  selectionRenderer = (value) => {
+    if(value == 1) {
+      this.props.type.input.onChange("inactivity");
+      this.props.sensor_type.input.onChange("all");
+    }
+    if(value == 2) {
+      this.props.type.input.onChange("geofencing");
+      this.props.sensor_type.input.onChange("all");
+    }
+  }
+
   render() {
     // console.log(this.props, "props")
     let type = (
@@ -139,38 +153,17 @@ class WrapperComponent extends React.Component {
       );
     return (
       <div>
-        <Toggle
-          toggled={this.state.inactivity}
-          label="Inactivity Alert"
-          style={{ width: "250px" }}
-          onToggle={(e, checked) => {
-            this.setState({ inactivity: checked }, () => {
-              if (checked) {
-                this.props.type.input.onChange("inactivity");
-                this.props.sensor_type.input.onChange("all");
-              } else {
-                this.props.type.input.onChange(null);
-                this.props.sensor_type.input.onChange(null);
-              }
-            });
+        <SelectField
+          floatingLabelText="Alert Type"
+          onChange={(e, k, v) => {
+            this.props.alert_type.input.onChange(v);
           }}
-        />
-        <Toggle
-          toggled={this.state.geofencing}
-          label="Geofencing Alert"
-          style={{ width: "250px" }}
-          onToggle={(e, checked) => {
-            this.setState({ geofencing: checked }, () => {
-              if (checked) {
-                this.props.type.input.onChange("geofencing");
-                this.props.sensor_type.input.onChange("all");
-              } else {
-                this.props.type.input.onChange(null);
-                this.props.sensor_type.input.onChange(null);
-              }
-            });
-          }}
-        />
+          value={this.props.alert_type.input.value}
+          selectionRenderer={this.selectionRenderer(this.props.alert_type.input.value)}
+        >
+          <MenuItem value={1} primaryText="Inactivity Alert" />
+          <MenuItem value={2} primaryText="Geofencing Alert" />
+        </SelectField>
         <br />
         {show_sensor_type && sensor_type}
         {show_sensor_type && type}
@@ -180,7 +173,7 @@ class WrapperComponent extends React.Component {
 }
 const AlertTypeField = props => (
   <Fields
-    names={["type", "value", "field", "sensor_type"]}
+    names={["type", "value", "field", "sensor_type", "alert_type"]}
     component={WrapperComponent}
   />
 );
