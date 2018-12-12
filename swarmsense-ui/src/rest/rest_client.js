@@ -46,7 +46,8 @@ function rest_client(type, resource, params, useToken = true) {
     let url = "";
     const { queryParameters } = fetchUtils;
     const options = {};
-    if (window.location.hash.length <= 25) {
+    let len = ((window.location.hash).split("?")).length;
+    if (len <= 1) {
       if (params.pagination) {
         params.pagination = { page: 1, perPage: params.pagination.perPage };
       }
