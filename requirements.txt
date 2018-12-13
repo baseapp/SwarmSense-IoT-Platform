@@ -30,5 +30,8 @@ bleach
 pika
 
 dogpile.cache
-cassandra-driver
-pandas
+# cassandra-driver
+# pandas
+gunicorn
+
+flask_pluginengine

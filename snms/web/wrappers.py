@@ -16,7 +16,7 @@ from flask.wrappers import Request
 from jinja2 import FileSystemLoader, TemplateNotFound
 from werkzeug.datastructures import ImmutableOrderedMultiDict
 from werkzeug.utils import cached_property
-
+from flask_pluginengine import PluginFlaskMixin
 
 _notset = object()
 
@@ -52,7 +52,7 @@ class SnmsRequest(Request):
         return rv
 
 
-class SnmsFlask(Flask):
+class SnmsFlask(PluginFlaskMixin, Flask):
     request_class = SnmsRequest
 
 

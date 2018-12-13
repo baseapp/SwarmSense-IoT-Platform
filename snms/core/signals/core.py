@@ -43,3 +43,9 @@ Executed when settings are changed.
 get_storage_backends = _signals.signal('get-storage-backends', """
 Expected to return one or more Storage subclasses.
 """)
+
+get_blueprints = _signals.signal('get-blueprints', """
+Expected to return one or more SwarmSensePluginBlueprint-based blueprints
+which will be registered on the application. The Blueprint must be named
+either *PLUGINNAME* or *compat_PLUGINNAME*.
+""")

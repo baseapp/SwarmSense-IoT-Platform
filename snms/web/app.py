@@ -27,6 +27,8 @@ from snms.core.db.sqlalchemy.core import on_models_committed
 from snms.core.db.sqlalchemy.logging import apply_db_loggers
 from snms.core.db.sqlalchemy.util.models import import_all_models
 from snms.core.logger import Logger
+from snms.core.plugins import plugin_engine
+from snms.utils.signals import values_from_signal
 from snms.web.stats import get_request_stats, setup_request_stats
 from snms.web.util import (discover_blueprints,)
 from snms.web.wrappers import SnmsFlask
@@ -155,6 +157,20 @@ def add_blueprints(app):
         app.register_blueprint(blueprint)
 
 
+def add_plugin_blueprints(app):
+    blueprint_names = set()
+    for plugin, blueprint in values_from_signal(signals.core.get_blueprints.send(app), return_plugins=True):
+        print(plugin)
+        expected_names = {'plugin_{}'.format(plugin.name), 'plugin_compat_{}'.format(plugin.name)}
+        if blueprint.name not in expected_names:
+            raise Exception("Blueprint '{}' does not match plugin name '{}'".format(blueprint.name, plugin.name))
+        if blueprint.name in blueprint_names:
+            raise Exception("Blueprint '{}' defined by multiple plugins".format(blueprint.name))
+        blueprint_names.add(blueprint.name)
+        with plugin.plugin_context():
+            app.register_blueprint(blueprint)
+
+
 def inject_current_url(response):
     # Make the current URL available. This is useful e.g. in case of
     # AJAX requests that were redirected due to url normalization if
@@ -224,6 +240,10 @@ def make_app(set_path=False, testing=False, config_override=None):
         add_blueprints(app)
         Logger.init_app(app)
         configure_mqtt(app)
+        plugin_engine.init_app(app, Logger.get('plugins'))
+        if not plugin_engine.load_plugins(app):
+            raise Exception('Could not load some plugins: {}'.format(', '.join(plugin_engine.get_failed_plugins(app))))
+        add_plugin_blueprints(app)
         signals.app_created.send(app)
 
         from flask_cors import CORS
