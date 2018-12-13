@@ -1,4 +1,4 @@
-Flask
+Flask==1.0.2
 flask-restful
 PyJWT
 psycopg2
@@ -8,8 +8,9 @@ raven[flask]
 marshmallow
 influxdb
 flup6
-celery
-redis
+kombu==4.1.0
+celery==4.1.0
+redis==2.10.6
 twilio
 paho-mqtt
 typing
@@ -22,7 +23,7 @@ alembic
 Flask-Migrate
 prompt_toolkit
 
-flower
+flower==0.9.2
 
 pytest
 contextlib2
@@ -32,4 +33,5 @@ pika
 dogpile.cache
 # cassandra-driver
 # pandas
-gunicorn
+gunicorn==19.8.1
+flask_pluginengine
