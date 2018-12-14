@@ -92,7 +92,7 @@ class ConfirmEmail extends React.Component {
     if (v_email) {
       restClient("CREATE", "resend-verification", { data: { email } })
         .then(json => {
-          this.notify("Operation completed successfully");
+          this.notify("Resent verification email");
           this.clear_resetp();
           this.setState({ ...this.state, reverify: false });
         })
@@ -113,7 +113,7 @@ class ConfirmEmail extends React.Component {
     if (v_email) {
       restClient("CREATE", "verify", { data: { ...this.state.resetp } })
         .then(json => {
-          this.notify("Operation completed successfully");
+          this.notify("Verification completed successfully");
           this.clear_resetp();
           this.setState({ ...this.state });
         })

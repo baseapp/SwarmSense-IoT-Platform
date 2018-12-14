@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -114,7 +114,7 @@ class Signup extends React.Component {
     if (v_email && v_name && v_pass & v_cb) {
       restClient("CREATE", "signup", { data: { ...this.state.signup } })
         .then(json => {
-          this.notify("Operation completed successfully", "success");
+          this.notify("A verification email has been sent to your email account. Please verify.", "success");
           this.clear_signup();
           this.setState({ ...this.state, content_flag: "login" });
         })
