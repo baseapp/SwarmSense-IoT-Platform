@@ -16,19 +16,21 @@ import { getAllSensorTypes } from "../rest";
 class WrapperComponent extends React.Component {
   constructor(props) {
     super(props);
+    props.alert_type.input.value= 0;
     this.state = {
       inactivity: this.props.type.input.value === "inactivity" ? true : false,
       geofencing: this.props.type.input.value === "geofencing" ? true : false,
       sensor_types: {},
       sensor_type_selected: null,
       sensor_type_field_selected: null,
-      value: 0
     };
   }
   componentWillReceiveProps(newProps) {
     let inactivity = newProps.type.input.value === "inactivity" ? true : false,
       geofencing = newProps.type.input.value === "geofencing" ? true : false;
     this.setState({ ...this.state, inactivity, geofencing });
+    if(newProps.alert_type.input.value == '')
+      newProps.alert_type.input.value=0;
   }
   async componentDidMount() {
     try {
@@ -52,9 +54,12 @@ class WrapperComponent extends React.Component {
       throw err; // improvise
     }
   }
-  handleChange = (event, index, value) => this.setState({ ...this.state, value: value });
 
   selectionRenderer = (value) => {
+    if(value == 0) {
+      this.props.type.input.onChange("");
+      this.props.sensor_type.input.onChange("");
+    }
     if(value == 1) {
       this.props.type.input.onChange("inactivity");
       this.props.sensor_type.input.onChange("all");
@@ -161,6 +166,7 @@ class WrapperComponent extends React.Component {
           value={this.props.alert_type.input.value}
           selectionRenderer={this.selectionRenderer(this.props.alert_type.input.value)}
         >
+          <MenuItem value={0} primaryText="Standard Alert" />
           <MenuItem value={1} primaryText="Inactivity Alert" />
           <MenuItem value={2} primaryText="Geofencing Alert" />
         </SelectField>
