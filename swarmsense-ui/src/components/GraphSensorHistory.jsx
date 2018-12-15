@@ -421,6 +421,11 @@ class SensorHistory extends React.Component {
               subtitle: {
                 text: `Min: ${min}, Max: ${max}, Mean: ${mean}, Count: ${count}`
               },
+              yAxis: {
+                title: {
+                    text: f.title || f.name
+                }
+              },
               series: [
                 {
                   color: getColor(),
