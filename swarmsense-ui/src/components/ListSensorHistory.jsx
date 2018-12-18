@@ -79,6 +79,7 @@ export class SensorsHistoryList extends React.Component {
           <FunctionField
             source={field_name}
             label={name}
+            sortable={false}
             key={i}
             render={record => {
               let val = record[field_name];
