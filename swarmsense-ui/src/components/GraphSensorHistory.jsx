@@ -402,7 +402,7 @@ class SensorHistory extends React.Component {
         for(var key in aggregate) {
             if(aggregate.hasOwnProperty(key)) {
               if (key.startsWith("mean") || key.startsWith("min") || key.startsWith("max"))
-                aggregate[key] = aggregate[key] ? parseFloat(aggregate[key]).toFixed(2) : undefined;
+                aggregate[key] = aggregate[key].toString() ? parseFloat(aggregate[key]).toFixed(2) : undefined;
               if (key.startsWith("count"))
                 aggregate[key] = aggregate[key] ? parseInt(aggregate[key]) : undefined;
             }
