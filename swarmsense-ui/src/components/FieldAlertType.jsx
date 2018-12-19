@@ -16,7 +16,15 @@ import { getAllSensorTypes } from "../rest";
 class WrapperComponent extends React.Component {
   constructor(props) {
     super(props);
-    props.alert_type.input.value= 0;
+    props.alert_type.input.value = props.type.input.value ? props.type.input.value : 0;
+    if (props.alert_type.input.value == 'inactivity') {
+      props.alert_type.input.value = 1;
+    }
+    else if (props.alert_type.input.value == 'geofencing') {
+      props.alert_type.input.value = 2;
+    } else {
+      props.alert_type.input.value = 0;
+    }
     this.state = {
       inactivity: this.props.type.input.value === "inactivity" ? true : false,
       geofencing: this.props.type.input.value === "geofencing" ? true : false,
@@ -56,9 +64,9 @@ class WrapperComponent extends React.Component {
   }
 
   selectionRenderer = (value) => {
-    if(value == 0) {
-      this.props.type.input.onChange("");
-      this.props.sensor_type.input.onChange("");
+    if(value == 0 && this.props.sensor_type.input.value == 'all') {
+      this.props.type.input.onChange(null);
+      this.props.sensor_type.input.onChange(null);
     }
     if(value == 1) {
       this.props.type.input.onChange("inactivity");
@@ -121,7 +129,8 @@ class WrapperComponent extends React.Component {
           )}
           <br />
           {this.state.sensor_types &&
-            this.state.sensor_type_selected && (
+            this.state.sensor_type_selected &&
+            this.state.sensor_types[this.state.sensor_type_selected] && (
               <SelectField
                 floatingLabelText="Field"
                 onChange={(e, k, v) => {
@@ -134,7 +143,7 @@ class WrapperComponent extends React.Component {
                 }}
                 value={this.props.field.input.value}
               >
-                {Object.getOwnPropertyNames(
+                {this.state.sensor_types[this.state.sensor_type_selected] && Object.getOwnPropertyNames(
                   this.state.sensor_types[this.state.sensor_type_selected]
                     .fields
                 ).map((name, i) => {
