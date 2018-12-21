@@ -15,6 +15,9 @@ import {
   ReferenceInput,
   SaveButton
 } from "admin-on-rest";
+import HelpIcon from "material-ui/svg-icons/action/help";
+import {cyan300} from 'material-ui/styles/colors';
+import IconButton from 'material-ui/IconButton';
 import { set_params } from "../utils";
 import { FieldLatLng as LatLongField } from "./index";
 
@@ -26,16 +29,28 @@ function SensorsCreate(props) {
         redirect="list"
         toolbar={<SaveButton label="Create" />}
       >
-        <TextInput source="name" />
+        <TextInput source="name" style={{ display: 'inline-block' }} />
+        <IconButton tooltip="Name of the sensor" style={{ display: 'inline-block', marginLeft: 32 }}  >
+        <HelpIcon color={cyan300} />
+        </IconButton>
+        <IconButton style={{ display: 'block', height: 0 }} />
         <ReferenceInput
           label="Sensor type"
           source="type"
           reference="sensor_types_all"
+          style={{ display: 'inline-block' }}
           allowEmpty
         >
           <SelectInput optionText="title" optionValue="type" />
         </ReferenceInput>
-        <TextInput source="hid" label="Serial Number(HID)" />
+        <IconButton tooltip="Sensor Type" style={{ display: 'inline-block', marginLeft: 32, position: 'absolute', marginTop: 10 }} >
+        <HelpIcon color={cyan300}/>
+        </IconButton>
+        <IconButton style={{ display: 'block', height: 0 }} />
+        <TextInput source="hid" label="Serial Number(HID)" style={{ display: 'inline-block' }}/>
+        <IconButton tooltip="Serial number for sensor" style={{ display: 'inline-block', marginLeft: 32 }} >
+        <HelpIcon color={cyan300}/>
+        </IconButton>
         <LatLongField />
       </SimpleForm>
     </Create>
