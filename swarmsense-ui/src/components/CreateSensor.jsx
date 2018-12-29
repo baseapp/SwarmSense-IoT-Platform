@@ -13,6 +13,7 @@ import {
   TextInput,
   SelectInput,
   ReferenceInput,
+  Toolbar,
   SaveButton
 } from "admin-on-rest";
 import HelpIcon from "material-ui/svg-icons/action/help";
@@ -21,13 +22,18 @@ import IconButton from 'material-ui/IconButton';
 import { set_params } from "../utils";
 import { FieldLatLng as LatLongField } from "./index";
 
+const MyToolbar = props =>
+ <Toolbar {...props} >
+   <SaveButton label="Create" />
+ </Toolbar>;
+
 function SensorsCreate(props) {
   return (
     <Create {...props}>
       <SimpleForm
         defaultValue={{ location_lat: 0, location_long: 0 }}
         redirect="list"
-        toolbar={<SaveButton label="Create" />}
+        toolbar={<MyToolbar />}
       >
         <TextInput source="name" style={{ display: 'inline-block' }} />
         <IconButton tooltip="Name of the sensor" style={{ display: 'inline-block', marginLeft: 32 }}  >
