@@ -124,9 +124,9 @@ class SensorConfigurationEdit extends React.Component {
             let _config = { name: config_name, type: config[config_name] };
             if (sensor_config.hasOwnProperty(config_name)) {
                 _config.value = response.data.config[config_name];
-                data.push(_config);
-                this.setState({ ...this.state, data: data, isLoading: false  });
             }
+            data.push(_config);
+            this.setState({ ...this.state, data: data, isLoading: false  });
           });
         });
       }
