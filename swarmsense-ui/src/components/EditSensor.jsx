@@ -9,6 +9,9 @@
 import React from "react";
 import { SimpleForm, TextInput, DisabledInput, Edit } from "admin-on-rest";
 import { ActionPanel, FieldLatLng as LatLongField } from "./index";
+import HelpIcon from "material-ui/svg-icons/action/help";
+import {cyan300} from 'material-ui/styles/colors';
+import IconButton from 'material-ui/IconButton';
 import { resolveIfSensor } from "../utils";
 import Forwarder from "./Forwarder";
 import InjectParams from "./InjectParams";
@@ -25,6 +28,10 @@ function SensorsEdit(props) {
               href: "#/sensor_configuration"
             },
             {
+              label: "Graph",
+              href: "#/sensor_chart"
+            },
+            {
               label: "Alerts",
               href: "#/sensor_alerts"
             },
@@ -37,16 +44,33 @@ function SensorsEdit(props) {
       }
     >
       <SimpleForm>
-        <TextInput source="name" />
-        <DisabledInput source="type" />
+        <TextInput source="name" style={{ display: 'inline-block' }} />
+        <IconButton tooltip="Name of the sensor" style={{ display: 'inline-block', marginLeft: 32 }}  >
+        <HelpIcon color={cyan300} />
+        </IconButton>
+        <IconButton style={{ display: 'block', height: 0 }} />
+        <DisabledInput source="type" style={{ display: 'inline-block' }} />
+        <IconButton tooltip="Sensor Type" style={{ display: 'inline-block', marginLeft: 32 }}  >
+        <HelpIcon color={cyan300} />
+        </IconButton>
+        <IconButton style={{ display: 'block', height: 0 }} />
         <TextInput
           source="key"
           options={{
             onChange: (e, v) => null,
             errorText: "Key can not be changed!"
           }}
+          style={{ display: 'inline-block' }}
         />
-        <TextInput source="hid" label="HID" />
+        <IconButton tooltip="Key of the sensor" style={{ display: 'inline-block', marginLeft: 32, position: 'absolute', marginTop: 10 }}  >
+        <HelpIcon color={cyan300} />
+        </IconButton>
+        <IconButton style={{ display: 'block', height: 0 }} />
+        <TextInput source="hid" label="HID" style={{ display: 'inline-block' }} />
+        <IconButton tooltip="Serial number for sensor" style={{ display: 'inline-block', marginLeft: 32 }}  >
+        <HelpIcon color={cyan300} />
+        </IconButton>
+        <IconButton style={{ display: 'block', height: 0 }} />
         <LatLongField />
       </SimpleForm>
     </Edit>
