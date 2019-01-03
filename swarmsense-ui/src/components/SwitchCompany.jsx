@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -76,6 +76,7 @@ class CompanySwitcher extends React.Component {
     }
     set_params("global_company", post_login_initials.global_company);
     this.props.dispatch(this.props.changeCompany(value));
+    this.context.router.history.push("/#")
   }
   make_default() {
     this.setState({ ...this.state, isLoading: true }, () => {

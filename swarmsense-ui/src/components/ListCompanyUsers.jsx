@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -13,6 +13,7 @@ import { SimpleList, ActionPanel } from "./index.js";
 import { set_params } from "../utils";
 import EditButton from "./EditButton";
 import UserFilter from "./FilterUser_name";
+import PostPagination from "./PostPagination";
 let CompaniesUsersList = props => {
   return (
     <List
@@ -21,6 +22,7 @@ let CompaniesUsersList = props => {
       filters={<UserFilter />}
       title="Users in company"
       actions={<ActionPanel />}
+      pagination={<PostPagination />}
     >
       {permissions => {
         const readOnly = permissions === "read" ? true : false;

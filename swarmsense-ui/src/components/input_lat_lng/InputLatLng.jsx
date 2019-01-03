@@ -11,6 +11,7 @@ import Leaflet from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Map, Marker, Popup, TileLayer } from "react-leaflet";
 import FlatButton from "material-ui/FlatButton";
+import TextField from "material-ui/TextField";
 import "./leaflet.css";
 
 Leaflet.Icon.Default.imagePath =
@@ -62,6 +63,24 @@ class LatLongInput extends React.Component {
     let { latlng: { lat: new_lat, lng: new_long } } = ev;
     this.setPosition(new_lat, new_long);
   }
+  componentDidMount() {
+    let {
+      location_lat: { input: { onChange: changeLatitude } },
+      location_long: { input: { onChange: changeLongitude } }
+    } = this.props;
+    navigator.geolocation.getCurrentPosition(location => {
+      this.setState({
+        ...this.state,
+        marker_lat: Number.parseFloat(location.coords.latitude),
+        marker_long: Number.parseFloat(location.coords.longitude),
+        reset_lat: Number.parseFloat(location.coords.latitude),
+        reset_long: Number.parseFloat(location.coords.longitude)
+      })
+      changeLatitude(Number.parseFloat(location.coords.latitude));
+      changeLongitude(Number.parseFloat(location.coords.longitude));
+    });
+  }
+
   render() {
     let { marker_lat: lat, marker_long: long, zoom } = this.state;
     let position =
@@ -75,8 +94,23 @@ class LatLongInput extends React.Component {
         <div style={{ marginTop: "5px", padding: "3px" }}>
           <div>
             <div>Position(latitude, longitude)</div>
-            <br />
-            <div>{`${lat}, ${long}`}</div>
+            <div>
+            <TextField
+                floatingLabelText="Latitude"
+                onChange={(e, k, v) => {
+                  this.props.location_lat.input.onChange(e.target.value);
+                }}
+                value={this.props.location_lat.input.value}
+            />
+            <TextField
+                floatingLabelText="Longitude"
+                onChange={(e, k, v) => {
+                  console.log(v);
+                  this.props.location_long.input.onChange(e.target.value);
+                }}
+                value={this.props.location_long.input.value}
+            />
+            </div>
             <br />
             <FlatButton
               label="Reset"

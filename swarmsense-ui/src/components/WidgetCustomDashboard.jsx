@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -11,6 +11,7 @@ import PropTypes from "prop-types";
 import Dialog from "material-ui/Dialog";
 import CircularProgress from "material-ui/CircularProgress";
 import EditWidget from "./EditWidgetCustomDashboard";
+import RaisedButton from "material-ui/RaisedButton";
 import Widget from "./WidgetGeneric";
 import WidgetText from "./WidgetText";
 import WidgetGraph from "./WidgetGraph";
@@ -93,7 +94,7 @@ class WidgetCustomDashboard extends React.Component {
         //this.logger("@render_view", this.props.sensor);
         //this.logger("@map_render: map_options", widget.map_options)
         if (!if_rendering_possible()) {
-          view = <div>Please configure sensor, first!</div>;
+          view = this.props.showMenu ? <div><RaisedButton label="Configure" onClick={() => this.onConfigure()} /></div> : <div>Please configure sensor, first!</div>;
         } else if (
           !this.props.sensor ||
           !this.props.sensor.live_updates ||

@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -20,6 +20,7 @@ import {
 import { resolveIfSensor } from "../utils";
 import Forwarder from "./Forwarder";
 import InjectParams from "./InjectParams";
+import PostPagination from "./PostPagination";
 
 export class SensorsHistoryList extends React.Component {
   constructor(props) {
@@ -78,6 +79,7 @@ export class SensorsHistoryList extends React.Component {
           <FunctionField
             source={field_name}
             label={name}
+            sortable={false}
             key={i}
             render={record => {
               let val = record[field_name];
@@ -138,6 +140,7 @@ export class SensorsHistoryList extends React.Component {
           perPage={20}
           filters={<HistoryFilter />}
           sort={{ field: "time", order: "DESC" }}
+          pagination={<PostPagination />}
         >
           <Responsive
             small={

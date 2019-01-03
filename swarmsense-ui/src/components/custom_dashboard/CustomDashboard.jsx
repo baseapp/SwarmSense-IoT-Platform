@@ -5,8 +5,10 @@
  *
  * License: www.baseapp.com/swarmsense-whitelabel-iot-platoform
  */
- 
+
 import React from "react";
+import RaisedButton from "material-ui/RaisedButton";
+import SaveIcon from "material-ui/svg-icons/content/save";
 import MenuItem from "material-ui/MenuItem";
 import LinearProgress from "material-ui/LinearProgress";
 import random from "lodash.random";
@@ -33,6 +35,14 @@ import {
   rest_client as restClient
 } from "../../rest";
 const ReactGridLayout = WidthProvider(Responsive);
+const styles = {
+  container: {
+    textAlign: "right",
+    marginTop: "-46px",
+    marginBottom: "46px",
+    marginRight: "80px"
+  }
+}
 
 /**
  * Makes a user dashboard or custom dashboard.
@@ -55,7 +65,8 @@ class CustomDashboard extends React.Component {
       mqtt_clients: [],
       sensors: [],
       layouts: {}, // layouts prop for the React grid layout (responsive),
-      dashboard_edit_mode: false
+      dashboard_edit_mode: false,
+      style: {display: 'none'}
     };
     this.logger = get_logger("CustomDashboard");
     this.mqtt_clients = [];
@@ -1076,14 +1087,15 @@ class CustomDashboard extends React.Component {
               this.setState(
                 {
                   ...this.state,
-                  dashboard_edit_mode: !this.state.dashboard_edit_mode
+                  dashboard_edit_mode: !this.state.dashboard_edit_mode,
+                  style: {}
                 },
                 () => {
                   if (this.state.dashboard_edit_mode) {
                     this.stopLiveUpdates();
                   } else {
                     this.setState(
-                      { ...this.state, loading: true },
+                      { ...this.state, loading: true, style: {display: 'none'} },
                       async () => {
                         try {
                           // save the dashboard with layout.
@@ -1153,6 +1165,90 @@ class CustomDashboard extends React.Component {
         onAddWidget={() => (readOnly ? null : this.addWidget())}
         title={this.state.dashboard_title}
       >
+      <div style={styles.container}>
+      <RaisedButton
+        label="Save"
+        labelPosition="after"
+        icon={<SaveIcon />}
+        style={this.state.style}
+        primary
+        onClick={() => {
+          this.setState(
+            {
+              ...this.state,
+              dashboard_edit_mode: !this.state.dashboard_edit_mode,
+              style: {display: 'none'}
+            },
+            () => {
+              if (this.state.dashboard_edit_mode) {
+                this.stopLiveUpdates();
+              } else {
+                this.setState(
+                  { ...this.state, loading: true },
+                  async () => {
+                    try {
+                      // save the dashboard with layout.
+                      let { company_id: cid } = this.props,
+                        {
+                          dashboard_title: name,
+                          layouts,
+                          sensor_type_id,
+                          dashboard_type
+                        } = this.state,
+                        data = {
+                          data: { name, layouts },
+                          sensor_type: sensor_type_id,
+                          dashboard_type
+                        };
+                      await updateDashboard({
+                        cid,
+                        dashboard_id,
+                        data
+                      });
+                    } catch (e) {
+                      this.logger("@save dashboard error", e.message);
+                    } finally {
+                      this.setState(
+                        { ...this.state, loading: false },
+                        () => {
+                          this.state.widgets
+                            .filter(
+                              ({ data_source: { sensor_id } }) =>
+                                this.props.sensor_id ? true : sensor_id
+                            )
+                            .map(
+                              ({
+                                data_source: { sensor_id: _sid },
+                                type
+                              }) => {
+                                let sensor_id = this.props.sensor_id
+                                  ? this.props.sensor_id
+                                  : _sid;
+                                return { sensor_id, type };
+                              }
+                            )
+                            .map(({ sensor_id, type }) => {
+                              if (type === "slider" || type === "toggle") {
+                                this.startLiveUpdates(
+                                  sensor_id,
+                                  "configuration"
+                                );
+                              } else {
+                                this.startLiveUpdates(sensor_id, "values");
+                              }
+                              return null;
+                            });
+                        }
+                      );
+                    }
+                  }
+                );
+              }
+            }
+          );
+        }}
+      />
+      </div>
         {this.render_widgets()}
       </Dashboard>
     );

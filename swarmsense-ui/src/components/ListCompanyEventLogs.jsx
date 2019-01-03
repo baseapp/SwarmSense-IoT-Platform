@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -15,6 +15,7 @@ import {
 } from "admin-on-rest";
 import { moments_ago } from "../utils";
 import { SimpleList } from "./index";
+import PostPagination from "./PostPagination";
 
 /**
  * Stateless component for creating grid - list of eventlogs.
@@ -25,7 +26,7 @@ import { SimpleList } from "./index";
 
 let EventsLog = props => {
   return (
-    <List {...props} title="Events log">
+    <List {...props} title="Events log" pagination={<PostPagination />}>
       <Responsive
         small={
           <SimpleList

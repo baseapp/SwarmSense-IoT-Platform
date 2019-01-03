@@ -60,6 +60,10 @@ const styles = {
     maxHeight: 150,
     overflowY: "auto",
     overflowX: "auto"
+  },
+  container: {
+    textAlign: "right",
+    marginRight: "25px"
   }
 };
 
@@ -84,7 +88,8 @@ class SensorHistory extends React.Component {
       redraw_charts: false,
       updates_data: [],
       realtime_allow: false,
-      displayUpdates: false
+      displayUpdates: false,
+      style: {display: 'none'},
     };
     this.mqtt_client = null;
     this.logger = get_logger("GraphSensorHistory", true);
@@ -397,7 +402,7 @@ class SensorHistory extends React.Component {
         for(var key in aggregate) {
             if(aggregate.hasOwnProperty(key)) {
               if (key.startsWith("mean") || key.startsWith("min") || key.startsWith("max"))
-                aggregate[key] = aggregate[key] ? parseFloat(aggregate[key]).toFixed(2) : undefined;
+                aggregate[key] = aggregate[key].toString() ? parseFloat(aggregate[key]).toFixed(2) : undefined;
               if (key.startsWith("count"))
                 aggregate[key] = aggregate[key] ? parseInt(aggregate[key]) : undefined;
             }
@@ -416,6 +421,11 @@ class SensorHistory extends React.Component {
               subtitle: {
                 text: `Min: ${min}, Max: ${max}, Mean: ${mean}, Count: ${count}`
               },
+              yAxis: {
+                title: {
+                    text: f.title || f.name
+                }
+              },
               series: [
                 {
                   color: getColor(),
@@ -425,7 +435,12 @@ class SensorHistory extends React.Component {
                     if (!isNaN(d[f.name])) {
                       y = d[f.name];
                     } else if (!isNaN(d[`mean_${f.name}`])) {
-                      y = d[`mean_${f.name}`];
+                        if (d[`mean_${f.name}`]) {
+                          y = d[`mean_${f.name}`].toFixed(window.application.settings.decimal_point ? window.application.settings.decimal_point : 2);
+                          y = Number(y);
+                        } else {
+                          y = d[`mean_${f.name}`];
+                        }
                     } else {
                       y = null;
                     }
@@ -493,6 +508,8 @@ class SensorHistory extends React.Component {
                 {!this.state.realtime_allow && (
                   <FlatButton
                     primary
+                    style={{height: '37px'}}
+                    labelStyle={{paddingTop: '1px'}}
                     label={
                       this.state.show_dates ? "Hide Filter" : "Show Filter"
                     }
@@ -504,6 +521,12 @@ class SensorHistory extends React.Component {
                     }}
                   />
                 )}
+                <FlatButton
+                  primary
+                  label="Configure"
+                  href="#/sensor_configuration"
+                  disabled={this.props.multiple}
+                />
                 <FlatButton
                   primary
                   label="Sensors"
@@ -684,6 +707,23 @@ class SensorHistory extends React.Component {
             })}
           </GridList>
         </div>
+        <div style={styles.container}>
+        <RaisedButton
+          label="Reset Zoom"
+          style={this.state.style}
+          primary
+          onClick={() => {
+            let { from_date, to_date } = this.getInitialDates(false);
+            this.setState(
+              { ...this.state, from_date, to_date, loading: true },
+              () => {
+                this.update_charts(true, true);
+                this.setState({ ...this.state, loading: false, style: {display: 'none'} });
+              }
+            );
+          }}
+        />
+        </div>
         <GraphArea
           loading={this.state.loading}
           data_version={this.state.version}
@@ -698,7 +738,7 @@ class SensorHistory extends React.Component {
             if (!this.state.realtime_allow) {
               let from_date = new Date(min),
                 to_date = new Date(max);
-              this.setState({ ...this.state, from_date, to_date }, () => {
+              this.setState({ ...this.state, from_date, to_date, style: {} }, () => {
                 this.update_charts(true, true);
               });
             }

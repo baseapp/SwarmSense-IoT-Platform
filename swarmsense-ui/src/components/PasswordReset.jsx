@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -113,7 +113,7 @@ class ResetPassword extends React.Component {
     if (v_email && v_code && v_pass) {
       restClient("CREATE", "reset-password", { data: { ...this.state.resetp } })
         .then(json => {
-          this.notify("Operation completed successfully");
+          this.notify("Password changed successfully");
           this.clear_resetp();
           this.setState({ ...this.state, content_flag: "login" });
         })

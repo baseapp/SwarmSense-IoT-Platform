@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -32,6 +32,7 @@ import { rest_client as restClient, getDashboards } from "../rest";
 import { resolveIfCompany } from "../utils";
 import Forwarder from "./Forwarder";
 import InjectParams from "./InjectParams";
+import PostPagination from "./PostPagination";
 
 export /**
  * Makes the list of sensors.
@@ -372,6 +373,7 @@ class SensorsList extends React.Component {
           sort={{ field: "last_update", order: "DESC" }}
           filters={<SensorFilter />}
           actions={<ActionPanel customButtons={customButtons} />}
+          pagination={<PostPagination />}
         >
           {permissions => {
             return (
@@ -380,7 +382,21 @@ class SensorsList extends React.Component {
                   <SimpleList
                     onEditItem={record => set_params("sensor", record)}
                     editItems={editItems}
-                    primaryText={record => `${record.name}`}
+                    primaryText={record => {
+                      return (
+                        <a
+                          style={linkStyle}
+                          onClick={() => {
+                            set_params("sensors", []);
+                            set_params("multiple", false);
+                            set_params("sensor", record);
+                          }}
+                          href="#/sensor_chart"
+                        >
+                          {record.name}
+                        </a>
+                      );
+                    }}
                     leftCheckbox={record => {
                       return (
                         <Checkbox

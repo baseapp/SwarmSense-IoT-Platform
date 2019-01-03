@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -16,8 +16,8 @@ import React from "react";
 function HistoryFilter(props) {
   return (
     <Filter {...props}>
-      <DateInput label="From" source="start_date" alwaysOn />
       <DateInput label="To" source="end_date" alwaysOn />
+      <DateInput label="From" source="start_date" alwaysOn />
     </Filter>
   );
 }

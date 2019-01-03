@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -17,6 +17,7 @@ import {
 import { SimpleList } from "./index";
 import EditButton from "./EditButton";
 import { set_params } from "../utils";
+import PostPagination from "./PostPagination";
 const SensorTypesList = props => {
   let make_fields = fields => {
     // generates comma separated string of all the fields(array input)
@@ -25,7 +26,7 @@ const SensorTypesList = props => {
     return Object.getOwnPropertyNames(fields).join(", ");
   };
   return (
-    <List {...props} title="Sensor Types List">
+    <List {...props} title="Sensor Types List" pagination={<PostPagination />}>
       {permissions => {
         const editItems = permissions === "read" ? false : true;
         return (

@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -9,6 +9,7 @@ import React from "react";
 import {
   List,
   Datagrid,
+  BooleanField,
   TextField,
   FunctionField,
   Responsive
@@ -22,6 +23,7 @@ import { resolveIfCompany } from "../utils";
 import Forwarder from "./Forwarder";
 import InjectParams from "./InjectParams";
 import EditButton from "./EditButton";
+import PostPagination from "./PostPagination";
 
 export class AlertsTypeList extends React.Component {
   // For listing the alert types
@@ -75,6 +77,7 @@ export class AlertsTypeList extends React.Component {
         title={title}
         perPage={20}
         actions={<ActionPanel customButtons={customButtons} />}
+        pagination={<PostPagination />}
       >
         {permissions => {
           let editItems = permissions === "read" ? false : true;
@@ -83,7 +86,19 @@ export class AlertsTypeList extends React.Component {
               small={
                 <SimpleList
                   onEditItem={record => set_params("alert", record)}
-                  primaryText={({ name }) => name}
+                  primaryText={({ name }) => {
+                    return (
+                      <a
+                        style={linkStyle}
+                        onClick={() => {
+                          set_params("alert", {name});
+                        }}
+                        href="#/alert_history"
+                      >
+                        {name}
+                      </a>
+                    );
+                  }}
                   editItems={editItems}
                   secondaryText={({ alert_text }) => alert_text}
                   menuItems={record => [
@@ -104,7 +119,7 @@ export class AlertsTypeList extends React.Component {
                         <a
                           style={linkStyle}
                           onClick={() => {
-                            set_params("alert", record);
+                            set_params("alert", record.id);
                           }}
                           href="#/alert_history"
                         >
@@ -118,7 +133,7 @@ export class AlertsTypeList extends React.Component {
                   <TextField source="snooze" />
                   <TextField source="type" />
                   <TextField source="value" />
-
+                  <BooleanField source="is_active" label="active" />
                   {editItems && (
                     <EditButton
                       onClick={record => set_params("alert", record)}

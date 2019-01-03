@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -19,7 +19,7 @@ import { SimpleList, ActionPanel } from "./index";
 import { resolveIfSensor } from "../utils";
 import Forwarder from "./Forwarder";
 import InjectParams from "./InjectParams";
-
+import PostPagination from "./PostPagination";
 /**
  * @extends React.Component
  * Lists all the events of a sensor
@@ -47,6 +47,7 @@ class ListSensorEvents extends React.Component {
         {...props}
         title={title}
         actions={<ActionPanel customButtons={customButtons} />}
+        pagination={<PostPagination />}
       >
         <Responsive
           small={

@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -24,6 +24,7 @@ import { resolveIfCompany } from "../utils";
 import Forwarder from "./Forwarder";
 import InjectParams from "./InjectParams";
 import EditButton from "./EditButton";
+import PostPagination from "./PostPagination";
 /**
  * @name NetworksList
  * @description View to list all the networks for the current company
@@ -37,7 +38,7 @@ let NetworksList = props => {
     fontSize: "0.93rem"
   };
   return (
-    <List {...props} title="Networks" actions={<ActionPanel />}>
+    <List {...props} title="Networks" actions={<ActionPanel />} pagination={<PostPagination />}>
       {permissions => {
         const editItems = permissions === "read" ? false : true;
         return (
@@ -46,7 +47,19 @@ let NetworksList = props => {
               <SimpleList
                 onEditItem={record => set_params("network", record)}
                 editItems={editItems}
-                primaryText={record => `${record.name}`}
+                primaryText={record => {
+                  return (
+                    <a
+                      style={linkStyle}
+                      onClick={() => {
+                        set_params("network", record);
+                      }}
+                      href="#/company_network_sensors"
+                    >
+                      {record.name}
+                    </a>
+                  );
+                }}
                 secondaryText={({ sensor_count, sensors_on, sensors_off }) => (
                   <div>
                     <span style={{ color: "green" }}>

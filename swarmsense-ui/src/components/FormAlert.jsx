@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -9,6 +9,8 @@ import React from "react";
 import {
   SimpleForm,
   TextInput,
+  NumberInput,
+  LongTextInput,
   BooleanInput,
   SelectInput
 } from "admin-on-rest";
@@ -212,6 +214,7 @@ function FormAlert(props) {
         }
       }}
     >
+      <TextInput source="name" />
       <FieldAlertType />
       <DependentInput
         dependsOn="type"
@@ -244,9 +247,11 @@ function FormAlert(props) {
       >
         <TextInput source="value" />
       </DependentInput>
-      <TextInput source="name" />
-      <TextInput source="alert_text" />
-      <BooleanInput source="is_active" label="Is Active" />
+      <LongTextInput
+        source="alert_text"
+      />
+      <BooleanInput source="is_active" label="Is Active" style={{position: 'absolute', right: '5%', top: '20%'}} />
+      <NumberInput source="threshold_duration" label="Threshold duration" defaultValue="0" />
       <TextInput source="snooze" />
       <DependentInput
         dependsOn="type"
