@@ -523,6 +523,12 @@ class SensorHistory extends React.Component {
                 )}
                 <FlatButton
                   primary
+                  label="Configure"
+                  href="#/sensor_configuration"
+                  disabled={this.props.multiple}
+                />
+                <FlatButton
+                  primary
                   label="Sensors"
                   onClick={() => null}
                   href="#/company_sensors"
