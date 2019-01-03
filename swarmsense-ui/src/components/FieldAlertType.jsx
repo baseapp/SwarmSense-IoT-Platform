@@ -12,6 +12,9 @@ import SelectField from "material-ui/SelectField";
 import Toggle from "material-ui/Toggle";
 import TextField from "material-ui/TextField";
 import { getAllSensorTypes } from "../rest";
+import HelpIcon from "material-ui/svg-icons/action/help";
+import {cyan300} from 'material-ui/styles/colors';
+import IconButton from 'material-ui/IconButton';
 
 class WrapperComponent extends React.Component {
   constructor(props) {
@@ -31,12 +34,14 @@ class WrapperComponent extends React.Component {
       sensor_types: {},
       sensor_type_selected: null,
       sensor_type_field_selected: null,
+      alert_type_selected: this.props.alert_type.input.value
     };
   }
   componentWillReceiveProps(newProps) {
     let inactivity = newProps.type.input.value === "inactivity" ? true : false,
       geofencing = newProps.type.input.value === "geofencing" ? true : false;
     this.setState({ ...this.state, inactivity, geofencing });
+    newProps.alert_type.input.value = this.state.alert_type_selected;
     if(newProps.alert_type.input.value == '')
       newProps.alert_type.input.value=0;
   }
@@ -81,12 +86,14 @@ class WrapperComponent extends React.Component {
   render() {
     // console.log(this.props, "props")
     let type = (
+      <div>
       <SelectField
         floatingLabelText="Type"
         onChange={(e, k, v) => {
           this.props.type.input.onChange(v);
         }}
         value={this.props.type.input.value}
+        style={{ display: 'inline-block' }}
       >
         <MenuItem value="lt" primaryText="Less Than" />
         <MenuItem value="lte" primaryText="Less Than or Equal To" />
@@ -95,6 +102,10 @@ class WrapperComponent extends React.Component {
         <MenuItem value="gt" primaryText="Greater Than" />
         <MenuItem value="gte" primaryText="Greater Than or Equal To" />
       </SelectField>
+      <IconButton tooltip="Type" style={{ display: 'inline-block', marginLeft: 64, position: 'absolute', marginTop: 15 }}  >
+      <HelpIcon color={cyan300} />
+      </IconButton>
+      </div>
     );
 
     let show_sensor_type =
@@ -102,6 +113,7 @@ class WrapperComponent extends React.Component {
       sensor_type = show_sensor_type ? (
         <div>
           {this.state.sensor_types && (
+            <div>
             <SelectField
               floatingLabelText="Sensor-type"
               onChange={(e, k, v) => {
@@ -113,6 +125,7 @@ class WrapperComponent extends React.Component {
                 );
               }}
               value={this.props.sensor_type.input.value}
+              style={{ display: 'inline-block' }}
             >
               {Object.getOwnPropertyNames(this.state.sensor_types).map(
                 (name, i) => {
@@ -126,11 +139,15 @@ class WrapperComponent extends React.Component {
                 }
               )}
             </SelectField>
+            <IconButton tooltip="Sensor Type" style={{ display: 'inline-block', marginLeft: 64, position: 'absolute', marginTop: 15 }}  >
+            <HelpIcon color={cyan300} />
+            </IconButton>
+            </div>
           )}
-          <br />
           {this.state.sensor_types &&
             this.state.sensor_type_selected &&
             this.state.sensor_types[this.state.sensor_type_selected] && (
+              <div>
               <SelectField
                 floatingLabelText="Field"
                 onChange={(e, k, v) => {
@@ -142,6 +159,7 @@ class WrapperComponent extends React.Component {
                   );
                 }}
                 value={this.props.field.input.value}
+                style={{ display: 'inline-block' }}
               >
                 {this.state.sensor_types[this.state.sensor_type_selected] && Object.getOwnPropertyNames(
                   this.state.sensor_types[this.state.sensor_type_selected]
@@ -160,6 +178,10 @@ class WrapperComponent extends React.Component {
                   );
                 })}
               </SelectField>
+              <IconButton tooltip="Field" style={{ display: 'inline-block', marginLeft: 64, position: 'absolute', marginTop: 15 }}  >
+              <HelpIcon color={cyan300} />
+              </IconButton>
+              </div>
             )}
         </div>
       ) : (
@@ -170,15 +192,24 @@ class WrapperComponent extends React.Component {
         <SelectField
           floatingLabelText="Alert Type"
           onChange={(e, k, v) => {
-            this.props.alert_type.input.onChange(v);
+            this.setState(
+              { ...this.state, alert_type_selected: v },
+              () => {
+                this.props.alert_type.input.onChange(v);
+              }
+            );
           }}
           value={this.props.alert_type.input.value}
           selectionRenderer={this.selectionRenderer(this.props.alert_type.input.value)}
+          style={{ display: 'inline-block' }}
         >
           <MenuItem value={0} primaryText="Standard Alert" />
           <MenuItem value={1} primaryText="Inactivity Alert" />
           <MenuItem value={2} primaryText="Geofencing Alert" />
         </SelectField>
+        <IconButton tooltip="Alert Type" style={{ display: 'inline-block', marginLeft: 64, position: 'absolute', marginTop: 15 }}  >
+        <HelpIcon color={cyan300} />
+        </IconButton>
         <br />
         {show_sensor_type && sensor_type}
         {show_sensor_type && type}

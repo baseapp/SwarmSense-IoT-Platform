@@ -31,6 +31,9 @@ import Leaflet from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Map, Polygon, TileLayer } from "react-leaflet";
 import "./input_lat_lng/leaflet.css";
+import HelpIcon from "material-ui/svg-icons/action/help";
+import {cyan300} from 'material-ui/styles/colors';
+import IconButton from 'material-ui/IconButton';
 
 /**
  * A custom {@link https://marmelab.com/admin-on-rest/Inputs.html#writing-your-own-input-component|input} component to draw a polygon on a map.
@@ -214,7 +217,11 @@ function FormAlert(props) {
         }
       }}
     >
-      <TextInput source="name" />
+      <TextInput source="name" style={{ display: 'inline-block' }} />
+      <IconButton tooltip="Alert Name" style={{ display: 'inline-block', marginLeft: 32 }}  >
+      <HelpIcon color={cyan300} />
+      </IconButton>
+      <IconButton style={{ display: 'block', height: 0 }} />
       <FieldAlertType />
       <DependentInput
         dependsOn="type"
@@ -239,20 +246,37 @@ function FormAlert(props) {
             { key: "Inside Fence", value: "inside" },
             { key: "Outside Fence", value: "outside" }
           ]}
+          style={{ display: 'inline-block' }}
         />
+        <IconButton tooltip="Alert When" style={{ display: 'inline-block', marginLeft: 32, position: 'absolute', marginTop: 10 }}  >
+        <HelpIcon color={cyan300} />
+        </IconButton>
+        <IconButton style={{ display: 'block', height: 0 }} />
       </DependentInput>
       <DependentInput
         dependsOn="type"
         resolve={type => (type === "geofencing" ? false : true)}
       >
-        <TextInput source="value" />
+        <TextInput source="value" style={{ display: 'inline-block' }} />
+        <IconButton tooltip="Value" style={{ display: 'inline-block', marginLeft: 32 }}  >
+        <HelpIcon color={cyan300} />
+        </IconButton>
+        <IconButton style={{ display: 'block', height: 0 }} />
       </DependentInput>
       <LongTextInput
         source="alert_text"
       />
       <BooleanInput source="is_active" label="Is Active" style={{position: 'absolute', right: '5%', top: '20%'}} />
-      <NumberInput source="threshold_duration" label="Threshold duration" defaultValue="0" />
-      <TextInput source="snooze" />
+      <NumberInput source="threshold_duration" label="Threshold duration" defaultValue="0" style={{ display: 'inline-block' }} />
+      <IconButton tooltip="Threshold Duration" style={{ display: 'inline-block', marginLeft: 32 }}  >
+      <HelpIcon color={cyan300} />
+      </IconButton>
+      <IconButton style={{ display: 'block', height: 0 }} />
+      <TextInput source="snooze" style={{ display: 'inline-block' }} />
+      <IconButton tooltip="Snooze" style={{ display: 'inline-block', marginLeft: 32 }}  >
+      <HelpIcon color={cyan300} />
+      </IconButton>
+      <IconButton style={{ display: 'block', height: 0 }} />
       <DependentInput
         dependsOn="type"
         resolve={type => (type === "inactivity" ? false : true)}
@@ -266,15 +290,29 @@ function FormAlert(props) {
           ]}
           optionText="label"
           optionValue="value"
+          style={{ display: 'inline-block' }}
         />
+        <IconButton tooltip="Action Type" style={{ display: 'inline-block', marginLeft: 32, position: 'absolute', marginTop: 10 }}  >
+        <HelpIcon color={cyan300} />
+        </IconButton>
+        <IconButton style={{ display: 'block', height: 0 }} />
       </DependentInput>
       <DependentInput dependsOn="action_type" value="notification">
         <TextInput
           source="recipients"
           parse={v => v.split(",").map(ob => ob.trim())}
           format={v => v.join(", ")}
+          style={{ display: 'inline-block' }}
         />
-        <TextInput source="web_hooks[0].url" label="Webhook(Url)" />
+        <IconButton tooltip="Recipients" style={{ display: 'inline-block', marginLeft: 32 }}  >
+        <HelpIcon color={cyan300} />
+        </IconButton>
+        <IconButton style={{ display: 'block', height: 0 }} />
+        <TextInput source="web_hooks[0].url" label="Webhook(Url)" style={{ display: 'inline-block' }} />
+        <IconButton tooltip="Webhook(Url)" style={{ display: 'inline-block', marginLeft: 32 }}  >
+        <HelpIcon color={cyan300} />
+        </IconButton>
+        <IconButton style={{ display: 'block', height: 0 }} />
         <FieldWebhookPayload addLabel label="Add url payload" />
       </DependentInput>
       <DependentInput dependsOn="action_type" value="trigger">
@@ -285,14 +323,24 @@ function FormAlert(props) {
         hintText="Start time"
         format={v => parse_time(v)}
         parse={v => extract_time(v)}
+        style={{ display: 'inline-block' }}
       />
+      <IconButton tooltip="Start Time" style={{ display: 'inline-block', marginLeft: 32 }}  >
+      <HelpIcon color={cyan300} />
+      </IconButton>
+      <IconButton style={{ display: 'block', height: 0 }} />
       <br />
       <FieldTimePicker
         source="between_end"
         hintText="End time"
         format={v => parse_time(v)}
         parse={v => extract_time(v)}
+        style={{ display: 'inline-block' }}
       />
+      <IconButton tooltip="End Time" style={{ display: 'inline-block', marginLeft: 32 }}  >
+      <HelpIcon color={cyan300} />
+      </IconButton>
+      <IconButton style={{ display: 'block', height: 0 }} />
     </SimpleForm>
   );
 }

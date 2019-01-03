@@ -1,4 +1,4 @@
-/** 
+/**
  * This file is part of SwarmSense IoT Platform
  * Copyright (c) 2018, Baseapp Systems And Softwares Private Limited
  * Authors: Gopal Lal
@@ -12,6 +12,9 @@ import MenuItem from "material-ui/MenuItem";
 import TextField from "material-ui/TextField";
 import LinearProgress from "material-ui/LinearProgress";
 import { getAllSensorTypes } from "../rest";
+import HelpIcon from "material-ui/svg-icons/action/help";
+import {cyan300} from 'material-ui/styles/colors';
+import IconButton from 'material-ui/IconButton';
 
 /**
  * An input for selecting config fields.
@@ -125,6 +128,7 @@ class FieldConfigSelector extends React.Component {
                   onChange={(e, k, value) => {
                     actuator_type.input.onChange(value);
                   }}
+                  style={{ display: 'inline-block' }}
                 >
                   {sensorTypes.map((stype, key) => {
                     return (
@@ -136,14 +140,19 @@ class FieldConfigSelector extends React.Component {
                     );
                   })}
                 </SelectField>
+                <IconButton tooltip="Actuator Type" style={{ display: 'inline-block', marginLeft: 64, position: 'absolute', marginTop: 15 }}  >
+                <HelpIcon color={cyan300} />
+                </IconButton>
                 <br />
                 {config_fields && (
+                  <div>
                   <SelectField
                     floatingLabelText="Config parameter"
                     value={config_field.input.value}
                     onChange={(e, k, value) =>
                       config_field.input.onChange(value)
                     }
+                    style={{ display: 'inline-block' }}
                   >
                     {Object.getOwnPropertyNames(config_fields).map(
                       (name, key) => (
@@ -151,9 +160,13 @@ class FieldConfigSelector extends React.Component {
                       )
                     )}
                   </SelectField>
+                  <IconButton tooltip="Config Parameter" style={{ display: 'inline-block', marginLeft: 64, position: 'absolute', marginTop: 15 }}  >
+                  <HelpIcon color={cyan300} />
+                  </IconButton>
+                  </div>
                 )}
-                <br />
                 {config_values && (
+                  <div>
                   <SelectField
                     value={config_value.input.value}
                     floatingLabelText="Change config value to"
@@ -167,13 +180,23 @@ class FieldConfigSelector extends React.Component {
                       );
                     })}
                   </SelectField>
+                  <IconButton tooltip="Config Values" style={{ display: 'inline-block', marginLeft: 64, position: 'absolute', marginTop: 15 }}  >
+                  <HelpIcon color={cyan300} />
+                  </IconButton>
+                  </div>
                 )}
                 {config_text_field && (
+                  <div>
                   <TextField
                     value={config_value.input.value}
                     onChange={(e, value) => config_value.input.onChange(value)}
                     floatingLabelText="Change config value to"
+                    style={{ display: 'inline-block' }}
                   />
+                  <IconButton tooltip="Config Values" style={{ display: 'inline-block', marginLeft: 64, position: 'absolute', marginTop: 15 }}  >
+                  <HelpIcon color={cyan300} />
+                  </IconButton>
+                  </div>
                 )}
               </div>
             );
