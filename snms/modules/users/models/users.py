@@ -27,7 +27,7 @@ class User(db.Model):
     reset_code = db.Column(db.String, nullable=True)
     verification_code = db.Column(db.String, nullable=True)
     is_verified = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     deleted = db.Column(db.Boolean, default=False)
 
     own_companies = db.relationship("Company", back_populates="owner", cascade="all, delete, delete-orphan")

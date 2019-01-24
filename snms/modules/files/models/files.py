@@ -20,4 +20,4 @@ class BinFile(db.Model):
     sensor_id = db.Column(db.Integer)
     uid = db.Column(db.String)
     meta_info = db.Column(db.JSON)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

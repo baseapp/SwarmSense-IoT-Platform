@@ -31,8 +31,8 @@ class Network(StoredFileMixin, db.Model):
     deleted = db.Column(db.Boolean, default=False)
     uid = db.Column(db.String, unique=True)
 
-    last_update = db.Column(db.DateTime, default=datetime.now())
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    last_update = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     sensors = db.relationship(
         "Sensor",

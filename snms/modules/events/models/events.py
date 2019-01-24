@@ -51,7 +51,7 @@ class Event(db.Model):
 
     start_date = db.Column(db.DateTime)
     next_runtime = db.Column(db.DateTime)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     deleted_at = db.Column(db.DateTime)
 
     company = db.relationship("Company", back_populates="events")

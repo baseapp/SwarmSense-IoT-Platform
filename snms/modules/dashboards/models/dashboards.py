@@ -35,8 +35,8 @@ class Dashboard(db.Model):
         default=False
     )
 
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
-    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     company = db.relationship(
         "Company",
@@ -58,8 +58,8 @@ class Widget(db.Model):
         db.ForeignKey('dashboards.id')
     )
 
-    updated_at = db.Column(db.DateTime, default=datetime.now(), onupdate=datetime.now)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     data = db.Column(db.JSON)
 

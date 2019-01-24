@@ -29,8 +29,8 @@ class Firmware(StoredFileMixin, db.Model):
     sensor_type = db.Column(db.String(50))
     is_deployed = db.Column(db.Boolean, default=False)
     test_sensors = db.Column(db.JSON) # UID list of sensors to test with
-    last_update = db.Column(db.DateTime, default=datetime.now())
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    last_update = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def _build_storage_path(self):
         self.assign_id()

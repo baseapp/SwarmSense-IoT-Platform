@@ -100,4 +100,4 @@ class UserInvite(db.Model):
     email = db.Column(db.String(200))
     role = db.Column(db.String(20), default=C_ROLE_DEFAULT)
     status = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
