@@ -42,6 +42,7 @@ DEFAULTS = {
     'LOGGING_CONFIG_FILE': 'logging.yaml',
     'LOGO_URL': None,
     'LOG_DIR': None,
+    'LOGGING_LEVEL': 'WARNING',
     'MAX_UPLOAD_FILES_TOTAL_SIZE': 0,
     'MAX_UPLOAD_FILE_SIZE': 0,
     'MEMCACHED_SERVERS': [],

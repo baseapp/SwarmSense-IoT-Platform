@@ -92,6 +92,12 @@ class Logger:
     @classmethod
     def initialize(cls):
         cls.default_logging['handlers']['file']['filename'] = cls._log_path(LOG_FILE)
+        cls.default_logging['handlers']['file']['level'] = config.LOGGING_LEVEL
+        cls.default_logging['handlers']['console']['level'] = config.LOGGING_LEVEL
+        if 'console' in config.LOGGERS:
+            del cls.default_logging['handlers']['console']
+        if 'file' in config.LOGGERS:
+            del cls.default_logging['handlers']['file']
         logging.config.dictConfig(cls.default_logging)
 
     @classmethod
