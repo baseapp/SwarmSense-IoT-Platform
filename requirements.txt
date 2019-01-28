@@ -27,7 +27,7 @@ flower
 pytest
 contextlib2
 bleach
-pika
+pika==0.11.2
 
 dogpile.cache
 # cassandra-driver
