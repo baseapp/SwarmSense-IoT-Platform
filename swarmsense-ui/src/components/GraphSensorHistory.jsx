@@ -400,7 +400,7 @@ class SensorHistory extends React.Component {
         let getColor = this.getColorIterator();
         let aggregate = this.state.data.aggregate || {};
         for(var key in aggregate) {
-            if(aggregate.hasOwnProperty(key)) {
+            if(aggregate.hasOwnProperty(key) && aggregate[key] !== null) {
               if (key.startsWith("mean") || key.startsWith("min") || key.startsWith("max"))
                 aggregate[key] = aggregate[key].toString() ? parseFloat(aggregate[key]).toFixed(2) : undefined;
               if (key.startsWith("count"))
