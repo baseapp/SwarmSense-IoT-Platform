@@ -15,7 +15,7 @@ from snms.modules.sensors.controllers import SensorsCollectionResource, \
     SensorsResource, SensorConfigResource, SensorHIDResource, SensorValueResource, \
     SensorHIDValuesResources, SensorsByTypeResource, SensorHistoryResource, \
     SensorDataExportResource, SensorAggregateResource, SensorHIDConfigResource, \
-    SensorHIDConfigAck
+    SensorHIDConfigAck, SensorValueDeleteResource
 
 from snms.modules.sensors.sensor_types_controller import SensorTypesCollectionResource, \
     SensorTypeResource, AllSensorTypes, SensorDataTypes
@@ -36,7 +36,7 @@ def output_json(data, code, headers=None):
     return resp
 
 _api.add_resource(SensorsCollectionResource, '/companies/<string:company_id>/sensors')
-_api.add_resource(SensorHIDResource, '/companies/<string:company_id>/sensor_by_hid/<string:sensor_hid>')
+_api.add_resource(SensorHIDResource, '/sensor_by_hid/<string:sensor_hid>', '/companies/<string:company_id>/sensor_by_hid/<string:sensor_hid>')
 _api.add_resource(SensorHIDValuesResources, '/companies/<string:company_id>/sensor_by_hid/<string:sensor_hid>/values')
 _api.add_resource(SensorsByTypeResource,
                   '/companies/<string:company_id>/sensors_by_type/<string:sensor_type>')
@@ -46,11 +46,13 @@ _api.add_resource(SensorsResource, '/sensors/<string:sensor_id>',
 _api.add_resource(SensorConfigResource, '/sensors/<string:sensor_id>/configuration')
 _api.add_resource(SensorHIDConfigResource, '/companies/<string:company_id>/sensor_by_hid/<string:sensor_hid>/configuration')
 _api.add_resource(SensorHIDConfigAck, '/companies/<string:company_id>/sensor_by_hid/<string:sensor_hid>/configuration/ack')
+
 _api.add_resource(SensorValueResource, '/sensors/<string:sensor_id>/values')
 _api.add_resource(SensorHistoryResource, 
                   '/sensors/<string:sensor_id>/history',
                   '/companies/<string:company_id>/sensor_by_hid/<string:sensor_hid>/history'
                   )
+_api.add_resource(SensorValueDeleteResource, '/sensors/<string:sensor_id>/values/delete')
 _api.add_resource(SensorDataExportResource, '/sensors/<string:sensor_id>/export')
 _api.add_resource(SensorAggregateResource, '/sensors/<string:sensor_id>/aggregate')
 

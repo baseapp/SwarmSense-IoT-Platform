@@ -5,8 +5,10 @@
 # License: www.baseapp.com/swarmsense-whitelabel-iot-platoform
 
 """Influx DB"""
+import json
+
 from influxdb import InfluxDBClient
-from influxdb.line_protocol import quote_ident
+from influxdb.line_protocol import quote_ident, quote_literal
 from snms.core.logger import Logger
 from snms.database import TSDBClient
 
@@ -259,3 +261,27 @@ class InfluxClient(TSDBClient):
 
     def restart(self):
         return
+
+    def delete_points(self, measurement=None, tags=None, end_date=None, start_date=None):
+        query_str = 'DELETE '
+        if measurement:
+            query_str += ' FROM {0}'.format(quote_ident(measurement))
+
+        if tags:
+            tag_eq_list = ["{0}={1}".format(quote_ident(k), quote_literal(str(v)))
+                           for k, v in tags.items()]
+            query_str += ' WHERE ' + ' AND '.join(tag_eq_list)
+
+        if end_date:
+            if tags:
+                query_str += ' AND time <= \'' + end_date + '\''
+            else:
+                query_str += ' WHERE time <= \'' + end_date + '\''
+
+        if start_date:
+            if tags or end_date:
+                query_str += ' AND time >= \'' + start_date + '\''
+            else:
+                query_str += ' WHERE time >= \'' + start_date + '\''
+        _LOGGER.debug(query_str)
+        self.client.query(query_str)

@@ -10,7 +10,7 @@ from snms.core.logger import Logger
 import json
 import datetime
 from snms.modules.sensors import Sensor
-from snms.modules.sensors.controllers import post_sensor_value_with_uid
+from snms.modules.sensors.controllers import post_sensor_value_with_uid, post_sensor_value_with_hid
 from tornado import gen
 from concurrent.futures import ThreadPoolExecutor
 
@@ -36,6 +36,7 @@ class EmqpConsumer(object):
     EXCHANGE_TYPE = 'topic'
     QUEUE = 'mqtt_consumer_master'
     ROUTING_KEY = 'sensors.*.values'
+    ROUTING_KEY_HID = 'sensors_hid.*.values'
 
     def __init__(self, amqp_url, app=None):
         """Create a new instance of the consumer class, passing in the AMQP
@@ -166,7 +167,7 @@ class EmqpConsumer(object):
 
     def set_qos(self):
         LOGGER.info("Setting QOS")
-        self._channel.basic_qos(prefetch_count=100)
+        self._channel.basic_qos(prefetch_count=10)
 
     def setup_exchange(self, exchange_name):
         """Setup the exchange on RabbitMQ by invoking the Exchange.Declare RPC
@@ -200,7 +201,7 @@ class EmqpConsumer(object):
 
         """
         LOGGER.info('Declaring queue %s', queue_name)
-        self._channel.queue_declare(self.on_queue_declareok, queue_name, auto_delete=True, arguments={"x-message-ttl": 600000})
+        self._channel.queue_declare(self.on_queue_declareok, queue_name, auto_delete=False, arguments={"x-message-ttl": 600000})
 
     def on_queue_declareok(self, method_frame):
         """Method invoked by pika when the Queue.Declare RPC call made in
@@ -216,6 +217,8 @@ class EmqpConsumer(object):
                     self.EXCHANGE, self.QUEUE, self.ROUTING_KEY)
         self._channel.queue_bind(self.on_bindok, self.QUEUE,
                                  self.EXCHANGE, self.ROUTING_KEY)
+        self._channel.queue_bind(None, self.QUEUE,
+                                 self.EXCHANGE, self.ROUTING_KEY_HID)
 
     def add_on_cancel_callback(self):
         """Add a callback that will be invoked if RabbitMQ cancels the consumer
@@ -280,10 +283,17 @@ class EmqpConsumer(object):
             return tag
         LOGGER.info(data)
         sensor_uid = topic.split(".")[1]
+        sensor_id_type = topic.split(".")[0]
         if 'fromServer' not in data.keys():
             LOGGER.debug(data)
-            with self.app.app_context():
-                post_sensor_value_with_uid(sensor_uid, data, datetime.datetime.now(datetime.timezone.utc), from_mqtt=True)
+            try:
+                with self.app.app_context():
+                    if sensor_id_type == 'sensors':
+                        post_sensor_value_with_uid(sensor_uid, data, datetime.datetime.now(datetime.timezone.utc), from_mqtt=True)
+                    elif sensor_id_type == 'sensors_hid':
+                        post_sensor_value_with_hid(sensor_uid, data, datetime.datetime.now(datetime.timezone.utc), from_mqtt=True)
+            except Exception as e:
+                LOGGER.error(e)
         return tag
 
     @gen.coroutine

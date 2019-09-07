@@ -22,6 +22,7 @@ class User(db.Model):
     email = db.Column(db.String, unique=True)
     password = db.Column(db.String)
     phone = db.Column(db.String)
+    data = db.Column(db.Text)
     role = db.Column(db.String, default='user')
     reset_password = db.Column(db.Boolean, default=False)
     reset_code = db.Column(db.String, nullable=True)

@@ -46,6 +46,9 @@ class TSDBClient:
     def create_defaults(self):
         pass
 
+    def delete_points(self, **kwargs):
+        pass
+
 
 class TSDB:
     """Time series database Class"""
@@ -107,6 +110,16 @@ class TSDB:
 
     def create_sensor(self, sensor_type, value_fields):
         self.client.create_sensor(sensor_type, value_fields)
+
+    def delete_points(self, **kwargs):
+        """
+        Delete from database.
+
+        :param start_date: Start Date of date range
+        :param end_date: End Date of date range
+        :param sensor: Sensor
+        """
+        return self.client.delete_points(**kwargs)
 
     def restart(self):
         self.client.restart()

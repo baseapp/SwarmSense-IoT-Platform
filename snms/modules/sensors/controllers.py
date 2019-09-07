@@ -19,6 +19,8 @@ import pytz
 
 from snms.models import add_event_log
 from snms.database import tsdb
+from snms.core import signals
+from snms.core.config import config
 from snms.core.db import db
 from snms.core.logger import Logger
 from snms.modules.companies import Company, user_company_acl_role
@@ -30,6 +32,7 @@ from snms.utils.crypto import generate_uid, generate_key
 from snms.modules.files import BinFile
 from snms.core.mqtt import mqtt
 from snms.const import ROLE_ADMIN, ROLE_READ
+from snms.tasks import delete_sensor_data
 
 _LOGGER = Logger.get()
 
@@ -81,7 +84,7 @@ class SensorsCollectionResource(Resource):
         sensor_types = get_all_types()
         for sensor in sensors[offset:offset + limit]:
             data, errors = SensorRequestSchema().dump(sensor)
-            role = g.company_user_role
+            role = g.get('company_user_role', ROLE_READ)
             if not role or role == ROLE_READ:
                 del(data['key'])
             if data['value']:
@@ -98,12 +101,16 @@ class SensorsCollectionResource(Resource):
         data, errors = SensorRequestSchema().load(request.get_json())
         if errors:
             return errors, 422
-        _LOGGER.info(data)
+        signals.sensors.sensor_pre_create.send(None, data=data)
         if not data['key']:
             data["key"] = generate_key()
+        # TODO: Check for Unique UID
         data["uid"] = generate_uid()
         if not data['hid']:
             data["hid"] = data["uid"]
+        else:
+            # TODO: Check for unique HID
+            pass
         sensor = Sensor(**data)
         sensor_types = get_all_types()
         config_fields = sensor_types[data['type']]['config_fields']
@@ -144,7 +151,7 @@ class SensorsByTypeResource(Resource):
         result_sensors = []
         for sensor in sensors[offset:offset + limit]:
             data, errors = SensorRequestSchema().dump(sensor)
-            role = g.company_user_role
+            role = g.get('company_user_role', ROLE_READ)
             if not role or role == ROLE_READ:
                 del(data['key'])
             result_sensors.append(data)
@@ -159,7 +166,7 @@ class SensorsResource(Resource):
         """Get sensor details"""
         sensor = Sensor.query.filter(Sensor.uid == sensor_id).filter(Sensor.deleted == False).first()
         data, errors = SensorRequestSchema().dump(sensor)
-        role = g.company_user_role
+        role = g.get('company_user_role', ROLE_READ)
         if not role or role == ROLE_READ:
             del(data['key'])
         return data
@@ -170,6 +177,7 @@ class SensorsResource(Resource):
         data, errors = SensorRequestSchema().load(request.get_json())
         if errors:
             return errors, 422
+        signals.sensors.sensor_pre_create.send(sensor, data=data)
         try:
             sensor.name = data["name"]
             sensor.location_lat = data["location_lat"]
@@ -183,7 +191,6 @@ class SensorsResource(Resource):
         except Exception as e:
             _LOGGER.error(e)
             return {"message": e}, 500
-
 
     def delete(self, sensor_id, company_id=None):
         """Delete sensor from database."""
@@ -231,7 +238,9 @@ class SensorConfigResource(Resource):
         sensor.config_updated = datetime.datetime.utcnow()
         db.session.add(sensor)
         db.session.commit()
-        mqtt.publish('sensors/{}/configuration'.format(sensor_id), json.dumps(conf))
+        if config.MQTT_BROKER_URL:
+            mqtt.publish('sensors/{}/configuration'.format(sensor_id), json.dumps(conf))
+            mqtt.publish('sensors_hid/{}/configuration'.format(sensor.hid), json.dumps(conf))
         return {}
 
 
@@ -275,7 +284,9 @@ class SensorHIDConfigResource(Resource):
         sensor.config_updated = datetime.datetime.utcnow()
         db.session.add(sensor)
         db.session.commit()
-        mqtt.publish('sensors/{}/configuration'.format(sensor.uid), json.dumps(conf))
+        if config.MQTT_BROKER_URL:
+            mqtt.publish('sensors/{}/configuration'.format(sensor.uid), json.dumps(conf))
+            mqtt.publish('sensors_hid/{}/configuration'.format(sensor.hid), json.dumps(conf))
         return {}
 
 
@@ -314,6 +325,14 @@ def time_in_range(start, end, x):
 
 def post_sensor_value_with_uid(sensor_uid, data, now, from_mqtt=False):
     sensor = Sensor.query.filter(Sensor.uid == sensor_uid).filter(Sensor.deleted == False).first()
+    if sensor is None:
+        _LOGGER.info("Sensor not found")
+        return
+    post_sensor_values(sensor, data, now, from_mqtt)
+
+
+def post_sensor_value_with_hid(sensor_hid, data, now, from_mqtt=False):
+    sensor = Sensor.query.filter(Sensor.hid == sensor_hid).filter(Sensor.deleted == False).first()
     if sensor is None:
         _LOGGER.info("Sensor not found")
         return
@@ -367,6 +386,8 @@ def post_sensor_values(sensor, args=None, now=None, from_mqtt=False):
     lng = None
 
     for field_name in list(args.keys()):
+        if field_name not in sensor_types[sensor.type]['fields'].keys():
+            continue
         if sensor_types[sensor.type]['fields'][field_name]['type'] == 'latitude':
             lat = args[field_name]
         elif sensor_types[sensor.type]['fields'][field_name]['type'] == 'longitude':
@@ -376,6 +397,7 @@ def post_sensor_values(sensor, args=None, now=None, from_mqtt=False):
         # TODO: Timezone naive issue
         try:
             time = parser.parse(request_time, ignoretz=True)
+            time = time.replace(tzinfo=datetime.timezone.utc)
             diff = (now - time).days
             if -1 <= diff <= 1:
                 args['time'] = request_time
@@ -394,12 +416,21 @@ def post_sensor_values(sensor, args=None, now=None, from_mqtt=False):
     Sensor.query.filter(Sensor.id == sensor.id).update(data)
     # TODO: Add value with sensor UID
     # TODO: Add time from request
-    tsdb.add_point(sensor, data['value'])
+
+    tsdb_data = data['value']
+    for key, field in sensor_types[sensor.type]['fields'].items():
+        if field.get('meta', False):
+            # Data is meta data, do not save to time series database
+            if key in tsdb_data.keys():
+                del tsdb_data[key]
+
+    tsdb.add_point(sensor, tsdb_data)
+
     process_sensor_alerts(sensor, data['value'])
     sensor_uid = sensor.uid
     db.session.commit()
 
-    if not from_mqtt:
+    if not from_mqtt and config.MQTT_BROKER_URL:
         if request_time is None:
             args['time'] = now.isoformat()
         # Publish the sensor value to MQTT channel.
@@ -529,7 +560,7 @@ class SensorDataExportResource(Resource):
 class SensorHIDResource(Resource):
     method_decorators = [access_control]
 
-    def get(self, company_id, sensor_hid):
+    def get(self, sensor_hid):
         """
         Get sensor by HID
 
@@ -537,12 +568,11 @@ class SensorHIDResource(Resource):
         :param sensor_hid:
         :return:
         """
-        company = Company.query.filter(Company.uid == company_id).filter(Company.deleted == False).first()
-        sensor = Sensor.query.filter(Sensor.company_id == company.id).filter(Sensor.hid == sensor_hid).filter(Sensor.deleted == False).first()
+        sensor = Sensor.query.filter(Sensor.hid == sensor_hid).filter(Sensor.deleted == False).first()
         if sensor is None:
             return {}, 404
         data, errors = SensorRequestSchema().dump(sensor)
-        role = g.company_user_role
+        role = g.get('company_user_role', ROLE_READ)
         if not role or role == ROLE_READ:
             del(data['key'])
         return data
@@ -584,3 +614,40 @@ class SensorAggregateResource(Resource):
         points = tsdb.get_points(sensor, order_by="time " + order_type,
                                  duration=duration, start_date=start_date, end_date=end_date, aggregate_only=True)
         return points
+
+
+class SensorValueDeleteResource(Resource):
+    """
+    Delete Sensor Value Resource.
+
+    Delete the sensor value for given range.
+    """
+    method_decorators = [access_control]
+
+    def post(self, sensor_id):
+        """Update sensor value"""
+        # TODO: Get the values and delete the files also for this period
+        sensor = g.sensor
+        if sensor is None:
+            sensor = Sensor.query.filter(Sensor.uid == sensor_id).filter(Sensor.deleted == False).first()
+        data = request.json
+        # try:
+        time = data.get('time', None)
+        start_date = None
+        end_date = None
+        if time:
+            start_date = time
+            end_date = time
+        else:
+            start_date = data.get('start_time', None)
+            end_date = data.get('end_time', None)
+        if start_date and end_date:
+            # time = parser.parser(time)
+            # _LOGGER.debug(time)
+            # tsdb.delete_points(sensor.type, {
+            #         "sensor_id": sensor.id,
+            #         "company_id": sensor.company_id
+            #     }, end_date=end_date, start_date=start_date)
+            delete_sensor_data.delay(sensor.type, sensor.company_id, sensor.id, start_date, end_date)
+
+        return {}

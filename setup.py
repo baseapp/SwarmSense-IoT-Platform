@@ -14,6 +14,7 @@ setup(
     name='snms',
     version=version,
     author='BaseApp Systems',
+    author_email='gopal@baseapp.com',
     packages=PACKAGES,
     include_package_data=True,
     install_requires=[
