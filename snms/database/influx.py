@@ -5,8 +5,10 @@
 # License: www.baseapp.com/swarmsense-whitelabel-iot-platoform
 
 """Influx DB"""
+import json
+
 from influxdb import InfluxDBClient
-from influxdb.line_protocol import quote_ident
+from influxdb.line_protocol import quote_ident, quote_literal
 from snms.core.logger import Logger
 from snms.database import TSDBClient
 
@@ -90,7 +92,8 @@ class InfluxClient(TSDBClient):
             _LOGGER.error(e)
 
     def get_points(self, sensor, limit=10000, order_by=None, start_date=None, end_date=None,
-                   duration=None, offset=0, function=None, group_duration=None, aggregate_only=False, value_fields=None):
+                   duration=None, offset=0, function=None, group_duration=None,
+                   aggregate_only=False, value_fields=None, aggregate_function=None, offset_interval=None):
         """
         Get time series data for sensor.
 
@@ -109,13 +112,18 @@ class InfluxClient(TSDBClient):
         group_by_clause = None
         order_by_clause = None
 
-        select_clause_min_max = "SELECT MIN(*), MAX(*), MEAN(*), COUNT(*)"
+        select_clause_min_max = "SELECT MIN(*), MAX(*), MEAN(*), COUNT(*), SUM(*)"
         select_clause = "SELECT *::field"
         select_clause_count = "SELECT COUNT(*)"
 
         if (duration or start_date or end_date) and group_duration:
-            select_clause = "SELECT MEAN(*)"
+            if aggregate_function and aggregate_function in ['SUM', 'MEAN', 'MIN', 'MAX']:
+                select_clause = "SELECT {}(*)".format(aggregate_function)
+            else:
+                select_clause = "SELECT MEAN(*)"
             group_by_clause = "GROUP BY time({})".format(group_duration)
+            if offset_interval:
+                group_by_clause = "GROUP BY time({}, {})".format(group_duration, offset_interval)
         from_clause = 'FROM "{}"'.format(sensor.type)
         where_clause = 'WHERE "sensor_id" = \'{}\' '.format(sensor.id)
         if duration:
@@ -259,3 +267,27 @@ class InfluxClient(TSDBClient):
 
     def restart(self):
         return
+
+    def delete_points(self, measurement=None, tags=None, end_date=None, start_date=None):
+        query_str = 'DELETE '
+        if measurement:
+            query_str += ' FROM {0}'.format(quote_ident(measurement))
+
+        if tags:
+            tag_eq_list = ["{0}={1}".format(quote_ident(k), quote_literal(str(v)))
+                           for k, v in tags.items()]
+            query_str += ' WHERE ' + ' AND '.join(tag_eq_list)
+
+        if end_date:
+            if tags:
+                query_str += ' AND time <= \'' + end_date + '\''
+            else:
+                query_str += ' WHERE time <= \'' + end_date + '\''
+
+        if start_date:
+            if tags or end_date:
+                query_str += ' AND time >= \'' + start_date + '\''
+            else:
+                query_str += ' WHERE time >= \'' + start_date + '\''
+        _LOGGER.debug(query_str)
+        self.client.query(query_str)

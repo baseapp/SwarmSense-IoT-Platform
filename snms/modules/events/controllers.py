@@ -117,7 +117,7 @@ class EventResource(Resource):
         """Delete a event from database"""
         try:
             event = Event.query.filter(Event.id == event_id).filter(Event.deleted_at == None).first()
-            event.deleted_at = datetime.now()
+            event.deleted_at = datetime.utcnow()
             db.session.add(event)
             db.session.commit()
             add_event_log(company_id=company_id, event_id=event.id, log='Event deleted: {}'.format(event.name))

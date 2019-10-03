@@ -25,7 +25,7 @@ class Sensor(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    type = db.Column(db.String(50))
+    type = db.Column(db.String(100))
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'))
     description = db.Column(db.String)
     location_lat = db.Column(db.Float)
@@ -39,7 +39,7 @@ class Sensor(db.Model):
     deleted = db.Column(db.Boolean, default=False)
     ip = db.Column(db.String)
     last_update = db.Column(db.DateTime)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     config_updated = db.Column(db.DateTime)
 
     value = db.Column(db.JSON)
@@ -62,6 +62,12 @@ class Sensor(db.Model):
     events = db.relationship(
         "SensorEventAssociation",
         back_populates="sensor")
+
+    sensor_type = db.relationship(
+        "SensorType", foreign_keys=[type], primaryjoin='Sensor.type == SensorType.type'
+    )
+
+
 
 
 class SensorType(db.Model):
@@ -107,7 +113,8 @@ class SensorType(db.Model):
 
     value_fields = db.Column(db.JSON)
     config_fields = db.Column(db.JSON)
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # TODO: Use deleted_at(Timestamp for soft deletes)
     deleted = db.Column(db.Boolean, default=False)
 
     # owner = db.relationship("User", back_populates="sensor_types")

@@ -36,6 +36,11 @@ services:
     volumes:
       - ./snms.conf:/etc/snms.conf
       - ./opt:/opt/snms
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
 
   influxdb:
     image: influxdb

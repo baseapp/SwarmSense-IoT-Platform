@@ -125,6 +125,7 @@ class NetworksResource(Resource):
     def get(self, company_id, network_id):
         """Get Network details"""
         network = Network.query.filter(Network.uid == network_id).filter(Network.deleted == False).first()
+        # TODO: Add network schema to return all the values
         return {"name": network.name, "id": network.uid, "floormap": network.filename}
 
     def put(self, company_id, network_id):

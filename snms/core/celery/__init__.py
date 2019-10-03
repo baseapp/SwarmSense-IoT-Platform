@@ -11,7 +11,7 @@ from flask import session
 
 from snms.core import signals
 from snms.database import tsdb
-from snms.core.celery.core import SnmsCelery
+from .core import SnmsCelery
 
 
 __all__ = ('celery',)

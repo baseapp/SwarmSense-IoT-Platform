@@ -10,9 +10,12 @@ import json
 import requests
 import pytz
 
-from flask import render_template, render_template_string
+from flask import render_template_string
+from jinja2 import Environment
 from sqlalchemy import or_, and_
 from celery.schedules import crontab
+from dateutil import parser
+
 
 from snms.core.celery import celery
 from snms.core.logger import Logger
@@ -25,6 +28,7 @@ from snms.modules.companies import Company
 from snms.modules.networks import Network, network_sensor_table
 from snms.modules.events import Event, SensorEventAssociation, get_next_runtime
 from snms.modules.users import User
+from snms.modules.files import BinFile
 from snms.core.mail import send_mail
 from snms.core.sms import send_sms
 from snms.core.mqtt import mqtt
@@ -77,6 +81,12 @@ def device_status():
     db.session.commit()
 
 
+def render_template(_str, **context):
+    env = Environment()
+    template = env.from_string(_str)
+    return template.render(context)
+
+
 def _get_details(sensor, alert, data=None):
     details = {
         'sensor_name': sensor.name,
@@ -97,8 +107,10 @@ def _get_details(sensor, alert, data=None):
     if alert.action_type == ALERT_ACTION_TRIGGER:
         details['alert_text'] = "Changing config value"
     else:
-        alert_text = render_template_string(alert.alert_text, **details)
+        alert_text = render_template(alert.alert_text, **details)
         details['alert_text'] = alert_text
+
+    details['alert_name'] = render_template(alert.name, **details)
     return details
 
 
@@ -144,6 +156,7 @@ def inactivity_alerts_check(sensor_id=None, backup_alert=False, seconds=0):
                     db.session.commit()
                 try:
                     alert_details = _get_details(sensor, alert)
+                    alert_details['sensor_status'] = 'Up' if backup_alert else 'Down',
                 except Exception as e:
                     _LOGGER.error(e)
                     continue
@@ -219,69 +232,111 @@ def process_alert(sensor_id, data):
     :param sensor_id: Sensor ID
     :param data: Current Values
     """
-    _LOGGER.debug("Processing Alert")
-    now = datetime.utcnow()
-    sensor = Sensor.query.get(sensor_id)
-    network_alerts = db.session.query(Alert, Sensor, SensorAlertStatus, SensorAlertAssociation).outerjoin(NetworkAlertAssociation).\
-        outerjoin(Network, and_(NetworkAlertAssociation.network_id == Network.id, Network.deleted == False)).\
-        outerjoin(network_sensor_table, Network.id == network_sensor_table.c.network_id).\
-        outerjoin(SensorAlertAssociation, SensorAlertAssociation.alert_id == Alert.id).\
-        join(Sensor, or_(Sensor.id == network_sensor_table.c.sensor_id, Sensor.id == SensorAlertAssociation.sensor_id)).\
-        outerjoin(SensorAlertStatus, and_(SensorAlertStatus.alert_id == Alert.id, SensorAlertStatus.sensor_id == Sensor.id)).\
-        filter(Sensor.id == sensor_id).\
-        filter(Alert.deleted == False).\
-        filter(Alert.is_active == True).all()
-    for alert, s, status, sa in network_alerts:
-        if not time_in_range(alert.between_start, alert.between_end, now.time()):
-            continue
+    try:
+        _LOGGER.debug("Processing Alert")
+        now = datetime.utcnow()
+        sensor = Sensor.query.get(sensor_id)
+        network_alerts = db.session.query(Alert, Sensor, SensorAlertStatus, SensorAlertAssociation).outerjoin(NetworkAlertAssociation).\
+            outerjoin(Network, and_(NetworkAlertAssociation.network_id == Network.id, Network.deleted == False)).\
+            outerjoin(network_sensor_table, Network.id == network_sensor_table.c.network_id).\
+            outerjoin(SensorAlertAssociation, SensorAlertAssociation.alert_id == Alert.id).\
+            join(Sensor, or_(Sensor.id == network_sensor_table.c.sensor_id, Sensor.id == SensorAlertAssociation.sensor_id)).\
+            outerjoin(SensorAlertStatus, and_(SensorAlertStatus.alert_id == Alert.id, SensorAlertStatus.sensor_id == Sensor.id)).\
+            filter(Sensor.id == sensor_id).\
+            filter(Alert.deleted == False).\
+            filter(Alert.is_active == True).all()
 
-        if alert.type not in [
-            ALERT_TYPE_LESS_THEN,
-            ALERT_TYPE_GRATER_THEN,
-            ALERT_TYPE_LESS_THEN_EQUAL,
-            ALERT_TYPE_GRATER_THEN_EQUAL,
-            ALERT_TYPE_EQUAL, ALERT_TYPE_NOT_EQUAL,
-            ALERT_TYPE_GEO_FENCING
-        ]:
-            continue
+        processed = set()  # To skip multiple processing of same alert
+        for alert, s, status, sa in network_alerts:
+            if alert.id in processed:
+                _LOGGER.debug("Already Processed")
+                continue
+            processed.add(alert.id)
+            _LOGGER.debug(alert.name)
+            if not time_in_range(alert.between_start, alert.between_end, now.time()):
+                _LOGGER.debug("Time not in range")
+                continue
 
-        alert_details = _get_details(sensor, alert)
-        if alert.type == ALERT_TYPE_GEO_FENCING:
-            alert_details['current_value'] = None
-        else:
-            alert_details['current_value'] = float(data[alert.field])
+            if alert.type not in [
+                ALERT_TYPE_LESS_THEN,
+                ALERT_TYPE_GRATER_THEN,
+                ALERT_TYPE_LESS_THEN_EQUAL,
+                ALERT_TYPE_GRATER_THEN_EQUAL,
+                ALERT_TYPE_EQUAL, ALERT_TYPE_NOT_EQUAL,
+                ALERT_TYPE_GEO_FENCING
+            ]:
+                _LOGGER.debug("Invalid alert type")
+                continue
 
-        if status is None or status.last_execute is None or (now - status.last_execute).total_seconds() > alert.snooze * 60:
+            try:
+                alert_details = _get_details(sensor, alert)
+            except Exception as e:
+                _LOGGER.error(e)
+                return
+            if alert.type == ALERT_TYPE_GEO_FENCING:
+                alert_details['current_value'] = None
+            else:
+                alert_details['current_value'] = float(data[alert.field])
+
+            if status and status.last_execute:
+                if not is_alert_triggered(alert_details, data, alert):
+                    if status.triggered:
+                        # Alert reset
+                        _LOGGER.debug("Alert Reset")
+                        alert_details['triggered'] = False
+                        send_alerts.delay(alert_details, alert.web_hooks)
+                    status.triggered = False
+                    status.last_execute = None
+                    db.session.add(status)
+                    db.session.commit()
+                    return
+
             if is_alert_triggered(alert_details, data, alert):
-                _LOGGER.debug("-------------------Alert Send------------------")
+                _LOGGER.debug("-------------------Alert Init------------------")
                 if status is None:
                     status = SensorAlertStatus(sensor_id=sensor.id, alert_id=alert.id)
-                status.last_execute = now
-                db.session.add(status)
-                db.session.commit()
-                if alert.action_type == ALERT_ACTION_TRIGGER:
-                    if sa and sa.actuator_id:
-                        actuator = Sensor.query.get(sa.actuator_id)
-                        if actuator:
-                            conf = dict(actuator.config)
-                            conf[alert.config_field] = alert.config_value
-                            actuator.config = conf
-                            actuator.config_updated = datetime.utcnow()
-                            db.session.add(actuator)
-                            _LOGGER.info(actuator.config)
-                            db.session.commit()
-                            mqtt.publish('sensors/{}/configuration'.format(actuator.uid), json.dumps(conf))
-                            # _LOGGER.info("Set field %s of %s with value %s" % (alert.config_field, actuator.name, alert.config_value))
-                        else:
-                            _LOGGER.error("Actuator not found")
-                        # _LOGGER.info("Trigger alert")
+                if status.last_execute is None:
+                    status.last_execute = now
+                if (not status.triggered and alert.threshold_duration and (now - status.last_execute).total_seconds() >= alert.threshold_duration * 60) \
+                        or (status.triggered and (now - status.last_execute).total_seconds() > alert.snooze * 60)\
+                        or (not status.triggered and not alert.threshold_duration):
+                    if status.triggered and (now - status.last_execute).total_seconds() > alert.snooze * 60:
+                        _LOGGER.debug("Snooze Alert")
+                    _LOGGER.debug("Alert triggered")
+                    alert_details['triggered'] = True
+                    status.triggered = True
+                    status.last_execute = now
+                    db.session.add(status)
+                    db.session.commit()
+                    if alert.action_type == ALERT_ACTION_TRIGGER:
+                        if sa and sa.actuator_id:
+                            actuator = Sensor.query.get(sa.actuator_id)
+                            if actuator:
+                                conf = dict(actuator.config)
+                                conf[alert.config_field] = alert.config_value
+                                actuator.config = conf
+                                actuator.config_updated = datetime.utcnow()
+                                db.session.add(actuator)
+                                _LOGGER.info(actuator.config)
+                                db.session.commit()
+                                mqtt.publish('sensors/{}/configuration'.format(actuator.uid), json.dumps(conf))
+                                # _LOGGER.info("Set field %s of %s with value %s" % (alert.config_field, actuator.name, alert.config_value))
+                            else:
+                                _LOGGER.error("Actuator not found")
+                                # _LOGGER.info("Trigger alert")
+                    else:
+                        send_alerts.delay(alert_details, alert.web_hooks)
+                    add_alert_history(sensor.company.uid, sensor.uid, alert.uid, alert_details)
                 else:
-                    send_alerts.delay(alert_details, alert.web_hooks)
-                add_alert_history(sensor.company.uid, sensor.uid, alert.uid, alert_details)
+                    db.session.add(status)
+                    db.session.commit()
+
             else:
                 _LOGGER.debug("Alert not triggered")
-        else:
-            _LOGGER.debug("--- Alert Snooze ---")
+
+        del processed
+    except Exception as e:
+        _LOGGER.error(e)
 
 
 @celery.task(name='snms.tasks.send_alert', ignore_result=True)
@@ -294,7 +349,10 @@ def send_alerts(alert_data, web_hooks=None):
         if user.phone is not None:
             phones.append(user.phone)
     if len(emails) > 0:
-        send_email.delay('Alert: '+alert_data['alert_name'], alert_data['alert_text'], emails,
+        alert = 'Alert triggered: '
+        if not alert_data.get('triggered', True):
+            alert = 'Alert reset: '
+        send_email.delay(alert + alert_data['alert_name'], alert_data['alert_text'], emails,
                          html_message=alert_data['alert_text'])
     if len(phones) > 0:
         send_text.delay(alert_data['alert_text'], phones)
@@ -321,10 +379,14 @@ def send_email(subject, message, recipient_list, from_email=None, **kwargs):
     :param message: Message
     :param recipient_list: Email Recipients
     """
-    _LOGGER.debug("Sending email to : {}".format(', '.join(recipient_list)))
-    if not from_email:
-        from_email = options.option[SETTING_EMAIL_FROM]
-    send_mail(subject, message, from_email, recipient_list, **kwargs)
+    _LOGGER.debug("Sending email to : {}, Subject: {}".format(', '.join(recipient_list), subject))
+    try:
+        if not from_email:
+            from_email = options.option[SETTING_EMAIL_FROM]
+        send_mail(subject, message, from_email, recipient_list, **kwargs)
+    except Exception as e:
+        _LOGGER.error(e)
+    _LOGGER.debug('Email sent')
 
 
 @celery.task(name='snms.tasks.send_text', ignore_result=True)
@@ -391,3 +453,87 @@ def run_schedule_events():
             event.next_runtime = get_next_runtime(event.start_date, event.repeat, event.unit)
             db.session.add(event)
     db.session.commit()
+
+
+@celery.task(name='snms.task.delete_sensor_data', ignore_result=True)
+def delete_sensor_data(sensor_type, company_id=None, sensor_id=None, start_date=None, end_date=None):
+    # Get all sensor type
+    # TODO: Delete files data
+    # TODO: Delete timeseries data
+    # TODO: Get all the sensors, if sensor has file data, delete that data
+    try:
+        tags = {}
+        if sensor_id:
+            tags['sensor_id'] = sensor_id
+        if company_id:
+            tags['company_id'] = company_id
+
+        if sensor_id:
+            sensor = Sensor.query.get(sensor_id)
+            if not sensor:
+                _LOGGER.error("Sensor not found")
+                return
+            sensor_type_model = SensorType.query.filter(SensorType.type == sensor_type).first()
+            files_data = False
+            file_field = None
+            if sensor_type_model:
+                # Check if sensor has files data
+                for _field_name, field in sensor_type_model.value_fields.items():
+                    _LOGGER.debug(field)
+                    if field['type'] == 'file':
+                        files_data = True
+                        file_field = _field_name
+                        break
+            if files_data:
+                # Get first and last filename
+                last_file_name = None
+                files_start_date = start_date
+                files_end_date = end_date
+                points = tsdb.get_points_raw(sensor_type, tags=tags, start_date=start_date, end_date=end_date, limit=100)
+                total = points.get('total', 0)
+                _LOGGER.debug(points)
+                if total > 0:
+                    for row in points['data']:
+                        last_file_name = row.get(file_field, None)
+                        if last_file_name:
+                            break
+
+                    _LOGGER.debug(last_file_name)
+
+                    first_file_name = None
+                    if total > 50:
+                        total -= 50
+                    else:
+                        total = 0
+                    points = tsdb.get_points_raw(sensor_type, tags=tags, start_date=start_date, end_date=end_date, offset=total, limit=100)
+                    total = points.get('total', 0)
+                    _LOGGER.debug(points)
+                    if total > 0:
+                        for row in points['data']:
+                            _name = row.get(file_field, None)
+                            if _name:
+                                first_file_name = _name
+                    _LOGGER.debug(first_file_name)
+
+                    if first_file_name:
+                        first_file = BinFile.query.filter(BinFile.uid == first_file_name).filter(BinFile.sensor_id == sensor_id).first()
+                        if first_file:
+                            files_start_date = first_file.created_at
+                            _LOGGER.debug(files_start_date)
+                    if last_file_name:
+                        last_file = BinFile.query.filter(BinFile.uid == last_file_name).filter(BinFile.sensor_id == sensor_id).first()
+                        if last_file:
+                            files_end_date = last_file.created_at
+                            _LOGGER.debug(files_end_date)
+                return
+            query = db.session.query(BinFile).filter(BinFile.sensor_id == sensor_id)
+            if start_date:
+                query = query.filter(BinFile.created_at >= parser.parse(start_date).isoformat())
+            if end_date:
+                query = query.filter(BinFile.created_at <= parser.parse(end_date).isoformat())
+            query.delete()
+            db.session.commit()
+
+        tsdb.delete_points(sensor_type, tags, end_date=end_date, start_date=start_date)
+    except Exception as e:
+        _LOGGER.error(e)

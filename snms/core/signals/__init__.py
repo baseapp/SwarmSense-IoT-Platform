@@ -5,7 +5,7 @@
 # License: www.baseapp.com/swarmsense-whitelabel-iot-platoform
 
 from snms.core.signals import users
-
+from snms.core.signals import sensors
 from snms.core.signals.core import *
 
-__all__ = ('users')
+__all__ = ('users', 'sensors')

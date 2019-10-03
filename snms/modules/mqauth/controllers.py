@@ -38,6 +38,9 @@ class UserPathResource(Resource):
         if username == config.MQTT_USERNAME and password == config.MQTT_PASSWORD:
             return make_response("allow administrator")
 
+        if username.startswith('gateway'):
+            return make_response("allow")
+
         if username.startswith('sensor'):
             sensor_uid = username.split("_")[1]
             sensor = Sensor.query.filter(Sensor.uid == sensor_uid) \
@@ -77,7 +80,7 @@ class VhostPathResource(Resource):
         if username == config.MQTT_USERNAME:
             return make_response("allow")
 
-        if username.startswith('sensor') or username.startswith('company'):
+        if username.startswith('sensor') or username.startswith('company') or username.startswith("gateway"):
             if args['vhost'] == mqtt_vhost:
                 return make_response("allow")
             else:
@@ -103,6 +106,7 @@ class ResourcePathResource(Resource):
         _LOGGER.debug(args)
         username = args['username']
         resource = args['resource']
+        permission = args['permission']
         name = args['name']
 
         if name == 'amq.topic':
@@ -111,7 +115,17 @@ class ResourcePathResource(Resource):
         if username == config.MQTT_USERNAME:
             return make_response("allow")
 
-        if username.startswith('sensor') and resource=='topic':
+        if username.startswith('gateway') and resource == 'topic':
+            gateway_uid = username.split("_")[1]
+            if name == 'gateway/{}/data'.format(gateway_uid):
+                return make_response("allow")
+            elif name == 'gateway/{}/config'.format(gateway_uid):
+                return make_response("allow")
+            else:
+                _LOGGER.debug("Resource Denied: %s, %s" % (username, name))
+                return make_response("deny")
+
+        if username.startswith('sensor') and resource == 'topic':
             sensor_uid = username.split("_")[1]
             if name == 'sensors/{}/values'.format(sensor_uid):
                 return make_response("allow")
@@ -157,8 +171,17 @@ class TopicPathResource(Resource):
 
         if username == config.MQTT_USERNAME:
             return make_response("allow")
+        if username.startswith('gateway') and resource =='topic':
+            gateway_uid = username.split("_")[1]
+            if routing_key == 'gateway.{}.data'.format(gateway_uid):
+                return make_response("allow")
+            elif routing_key == 'gateway.{}.config'.format(gateway_uid):
+                return make_response("allow")
+            else:
+                _LOGGER.debug("Resource Denied: %s, %s" % (username, name))
+                return make_response("deny")
 
-        if username.startswith('sensor') and resource=='topic':
+        if username.startswith('sensor') and resource =='topic':
             sensor_uid = username.split("_")[1]
             if routing_key == 'sensors.{}.values'.format(sensor_uid):
                 return make_response("allow")
@@ -167,7 +190,7 @@ class TopicPathResource(Resource):
             else:
                 _LOGGER.debug("Resource Denied: %s, %s" % (username, routing_key))
                 return make_response("deny")
-        elif username.startswith('company') and resource=='topic':
+        elif username.startswith('company') and resource == 'topic':
             company_uid = username.split("_")[1]
             company = Company.query.filter(Company.uid == company_uid).filter(Company.deleted == False).first()
             try:

@@ -59,6 +59,7 @@ class SensorAlertStatus(db.Model):
     sensor_id = db.Column(db.Integer, db.ForeignKey('sensors.id', ondelete="CASCADE"))
     alert_id = db.Column(db.Integer, db.ForeignKey('alerts.id', ondelete="CASCADE"))
     last_execute = db.Column(db.DateTime)
+    triggered = db.Column(db.Boolean)
 
 
 class Alert(db.Model):
@@ -93,10 +94,11 @@ class Alert(db.Model):
     between_start = db.Column(db.Time)
     between_end = db.Column(db.Time)
     snooze = db.Column(db.Integer)
+    threshold_duration = db.Column(db.Integer, default=0)  # Trigger only if alert is active for this duration in minutes
     alert_text = db.Column(db.String)
     recipients = db.Column(db.JSON)
     web_hooks = db.Column(db.JSON)
-    alert_if = db.Column(db.String)
+    alert_if = db.Column(db.String)  # Alert if point is inside or outside
     polygon = db.Column(db.JSON)
     is_active = db.Column(db.Boolean, default=True)
     deleted = db.Column(db.Boolean, default=False)
@@ -106,7 +108,7 @@ class Alert(db.Model):
     config_field = db.Column(db.String)
     config_value = db.Column(db.String)
 
-    created_at = db.Column(db.DateTime, default=datetime.now())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     company = db.relationship("Company", back_populates="alerts")
     sensors = db.relationship(
@@ -128,6 +130,7 @@ class AlertSchema(Schema):
     between_start = fields.Time(missing="00:00:00")
     between_end = fields.Time(missing="23:59:59")
     snooze = fields.Integer(missing=None)
+    threshold_duration = fields.Integer(missing=0)
     alert_text = fields.String(missing=None)
     recipients = fields.List(fields.Email, missing=[])
     web_hooks = fields.List(fields.Dict, missing=[])
