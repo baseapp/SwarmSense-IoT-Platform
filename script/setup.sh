@@ -57,6 +57,7 @@ install_postgres()
 {
     log "Installing PostgreSql"
     apt-get install -y postgresql postgresql-contrib
+    apt-get install -y python-psycopg2 libpq-dev
     service postgresql start
 }
 

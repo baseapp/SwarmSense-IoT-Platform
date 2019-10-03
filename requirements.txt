@@ -22,7 +22,8 @@ alembic
 Flask-Migrate
 prompt_toolkit
 
-flower
+https://github.com/mher/flower/zipball/master
+Babel
 
 pytest
 contextlib2
