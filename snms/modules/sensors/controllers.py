@@ -487,6 +487,14 @@ class SensorHistoryResource(Resource):
         start_date = None
         end_date = None
         group_duration = None
+        aggregate_function = None
+        if "aggregate_function" in filter.keys():
+            aggregate_function = filter['aggregate_function']
+
+        offset_interval = None
+        if "offset_interval" in filter.keys():
+            offset_interval = filter['offset_interval']
+
         if "group_duration" in filter.keys():
             group_duration = filter["group_duration"]
 
@@ -504,7 +512,7 @@ class SensorHistoryResource(Resource):
         sensor_types = get_all_types()
         value_fields = sensor_types[sensor.type]['fields']
         points = tsdb.get_points(sensor, limit=limit, offset=offset, order_by="time " + order_type,
-                                 duration=duration, start_date=start_date, end_date=end_date, group_duration=group_duration, value_fields= value_fields)
+                                 duration=duration, start_date=start_date, end_date=end_date, group_duration=group_duration, value_fields= value_fields, aggregate_function=aggregate_function, offset_interval=offset_interval)
         points['fields'] = None
         if sensor.type in sensor_types.keys():
             points['fields'] = value_fields
@@ -602,6 +610,11 @@ class SensorAggregateResource(Resource):
         duration = None
         start_date = None
         end_date = None
+        aggregate_function = None
+
+        offset_interval = None
+        if "offset_interval" in filter.keys():
+            offset_interval = filter['offset_interval']
 
         if "duration" in filter.keys():
             duration = filter["duration"]
@@ -610,9 +623,12 @@ class SensorAggregateResource(Resource):
                 start_date = filter['start_date']
             if "end_date" in filter.keys():
                 end_date = filter['end_date']
+        if "aggregate_function" in filter.keys():
+            aggregate_function = filter['aggregate_function']
         order_type = 'DESC'
         points = tsdb.get_points(sensor, order_by="time " + order_type,
-                                 duration=duration, start_date=start_date, end_date=end_date, aggregate_only=True)
+                                 duration=duration, start_date=start_date,
+                                 end_date=end_date, aggregate_only=True, aggregate_function=aggregate_function, offset_interval=offset_interval)
         return points
 
 

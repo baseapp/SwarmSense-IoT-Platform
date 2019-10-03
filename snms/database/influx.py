@@ -92,7 +92,8 @@ class InfluxClient(TSDBClient):
             _LOGGER.error(e)
 
     def get_points(self, sensor, limit=10000, order_by=None, start_date=None, end_date=None,
-                   duration=None, offset=0, function=None, group_duration=None, aggregate_only=False, value_fields=None):
+                   duration=None, offset=0, function=None, group_duration=None,
+                   aggregate_only=False, value_fields=None, aggregate_function=None, offset_interval=None):
         """
         Get time series data for sensor.
 
@@ -111,13 +112,18 @@ class InfluxClient(TSDBClient):
         group_by_clause = None
         order_by_clause = None
 
-        select_clause_min_max = "SELECT MIN(*), MAX(*), MEAN(*), COUNT(*)"
+        select_clause_min_max = "SELECT MIN(*), MAX(*), MEAN(*), COUNT(*), SUM(*)"
         select_clause = "SELECT *::field"
         select_clause_count = "SELECT COUNT(*)"
 
         if (duration or start_date or end_date) and group_duration:
-            select_clause = "SELECT MEAN(*)"
+            if aggregate_function and aggregate_function in ['SUM', 'MEAN', 'MIN', 'MAX']:
+                select_clause = "SELECT {}(*)".format(aggregate_function)
+            else:
+                select_clause = "SELECT MEAN(*)"
             group_by_clause = "GROUP BY time({})".format(group_duration)
+            if offset_interval:
+                group_by_clause = "GROUP BY time({}, {})".format(group_duration, offset_interval)
         from_clause = 'FROM "{}"'.format(sensor.type)
         where_clause = 'WHERE "sensor_id" = \'{}\' '.format(sensor.id)
         if duration:
