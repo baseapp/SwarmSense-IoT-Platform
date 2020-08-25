@@ -26,7 +26,7 @@
     "aor-language-spanish": "^1.0.3",
     "aor-language-vietnamese": "^1.0.2",
     "documentation": "^5.4.0",
-    "highcharts": "^6.0.7",
+    "highcharts": "^7.2.2",
     "leaflet": "^1.3.1",
     "lodash.isequal": "^4.5.0",
     "lodash.max": "^4.0.1",
