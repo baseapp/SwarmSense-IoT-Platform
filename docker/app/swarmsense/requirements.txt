@@ -9,7 +9,7 @@ marshmallow
 influxdb
 flup6
 kombu==4.1.0
-celery==4.1.0
+celery==5.2.2
 redis==2.10.6
 twilio
 paho-mqtt
