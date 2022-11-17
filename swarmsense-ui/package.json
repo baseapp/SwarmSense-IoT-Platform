@@ -49,7 +49,7 @@
     "rrule": "^2.2.9"
   },
   "devDependencies": {
-    "react-scripts": "^1.1.1"
+    "react-scripts": "^5.0.1"
   },
   "config": {
     "pack_name": "swarmsense-ui",
